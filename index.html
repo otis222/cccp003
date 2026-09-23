@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-EKFD1PNSN7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-EKFD1PNSN7');
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>葉俸瑜 | 個人檔案 - ENDFIELD OPERATOR RECORD</title>
+  
+  <!-- Google Fonts: Chakra Petch (Endfield sci-fi vibe) & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       明日方舟：終末地 (Arknights: Endfield) 工業戰術視覺系統規範
+       ========================================================================== */
+    :root {
+      --ef-bg-dark: #0a0c10;
+      --ef-bg-card: #12161f;
+      --ef-bg-card-hover: #181e2b;
+      --ef-bg-panel: #1b202c;
+      --ef-border-subtle: #272f3d;
+      --ef-border-bright: #3d4a5e;
+      
+      /* 終末地標誌性高彩工業色 */
+      --ef-yellow: #f8af00;
+      --ef-yellow-light: #ffd24d;
+      --ef-yellow-glow: rgba(248, 175, 0, 0.25);
+      --ef-orange: #ff5500;
+      --ef-cyan: #00f0ff;
+      --ef-cyan-dim: rgba(0, 240, 255, 0.15);
+      
+      /* 文字色系 */
+      --ef-text-primary: #f2f5f8;
+      --ef-text-secondary: #9aa8b8;
+      --ef-text-dim: #5c6a7a;
+      
+      /* 字型系統 */
+      --font-display: 'Chakra Petch', sans-serif;
+      --font-body: 'Noto Sans TC', sans-serif;
+      --font-mono: 'Share Tech Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--ef-bg-dark);
+      color: var(--ef-text-primary);
+      font-family: var(--font-body);
+      line-height: 1.65;
+      overflow-x: hidden;
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(248, 175, 0, 0.03) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.03) 0%, transparent 40%),
+        linear-gradient(rgba(18, 22, 31, 0.5) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(18, 22, 31, 0.5) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+      position: relative;
+    }
+
+    /* 頂部戰術裝飾線 */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--ef-yellow) 0%, var(--ef-yellow) 40%, var(--ef-cyan) 85%, transparent 100%);
+      z-index: 9999;
+    }
+
+    /* 掃描線光效 */
+    .scanline-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      z-index: 900;
+      opacity: 0.35;
+    }
+
+    /* 戰術斜切角幾何樣式 (Chamfered Corner) */
+    .ef-cut-corner-br {
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+    }
+    .ef-cut-corner-both {
+      clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+    }
+
+    /* 警示斑馬紋 (Hazard Stripes) */
+    .hazard-stripe-strip {
+      height: 6px;
+      background: repeating-linear-gradient(
+        -45deg,
+        var(--ef-yellow),
+        var(--ef-yellow) 10px,
+        #14171d 10px,
+        #14171d 20px
+      );
+    }
+
+    /* 容器架構 */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ==========================================================================
+       導覽列 (NAVBAR)
+       ========================================================================== */
+    .ef-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(10, 12, 16, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--ef-border-subtle);
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 68px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-symbol {
+      width: 28px;
+      height: 28px;
+      background: var(--ef-yellow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      clip-path: polygon(0 0, 100% 0, 80% 100%, 0% 100%);
+      font-weight: 900;
+      font-family: var(--font-display);
+      color: #000;
+      font-size: 16px;
+      box-shadow: 0 0 15px var(--ef-yellow-glow);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--ef-text-primary);
+    }
+
+    .brand-sub {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--ef-yellow);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      gap: 4px;
+    }
+
+    .nav-item {
+      position: relative;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ef-text-secondary);
+      text-decoration: none;
+      letter-spacing: 1px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--ef-yellow);
+      background: rgba(248, 175, 0, 0.08);
+      border-color: rgba(248, 175, 0, 0.3);
+    }
+
+    .coming-soon-badge {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      padding: 1px 5px;
+      background: #252d3a;
+      color: #8da0b5;
+      border: 1px solid #3b4657;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sound-toggle-btn {
+      background: transparent;
+      border: 1px solid var(--ef-border-subtle);
+      color: var(--ef-text-dim);
+      padding: 6px 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 12px;
+      transition: all 0.2s;
+    }
+
+    .sound-toggle-btn:hover {
+      border-color: var(--ef-yellow);
+      color: var(--ef-yellow);
+    }
+
+    /* 手機選單漢堡按鈕 */
+    .mobile-menu-btn {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--ef-border-bright);
+      color: var(--ef-text-primary);
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    /* ==========================================================================
+       HERO 區塊 (OPERATOR PROFILE HERO)
+       ========================================================================== */
+    .hero-section {
+      padding: 72px 0 54px;
+      position: relative;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.95fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero-meta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(248, 175, 0, 0.08);
+      border-left: 3px solid var(--ef-yellow);
+      padding: 4px 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ef-yellow);
+      letter-spacing: 1.5px;
+      margin-bottom: 18px;
+    }
+
+    .hero-meta-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--ef-yellow);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--ef-yellow);
+      animation: pulse-dot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.8); }
+    }
+
+    .hero-title-group {
+      margin-bottom: 24px;
+    }
+
+    .hero-title-en {
+      font-family: var(--font-display);
+      font-size: 16px;
+      color: var(--ef-text-dim);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .hero-name {
+      font-size: 48px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #ffffff;
+      line-height: 1.15;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+
+    .hero-name .en-tag {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--ef-text-secondary);
+      letter-spacing: 2px;
+    }
+
+    .hero-identity {
+      font-size: 19px;
+      font-weight: 500;
+      color: var(--ef-text-primary);
+      line-height: 1.4;
+      border-left: 2px solid var(--ef-cyan);
+      padding-left: 14px;
+      margin-bottom: 20px;
+    }
+
+    .hero-identity-en {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ef-cyan);
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    .hero-quick-data {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 32px;
+      background: rgba(18, 22, 31, 0.7);
+      border: 1px solid var(--ef-border-subtle);
+      padding: 16px;
+      position: relative;
+    }
+
+    .hero-quick-data::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      left: 12px;
+      width: 32px;
+      height: 2px;
+      background: var(--ef-yellow);
+    }
+
+    .quick-data-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .quick-data-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ef-text-dim);
+      letter-spacing: 1px;
+    }
+
+    .quick-data-val {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ef-text-primary);
+    }
+
+    .hero-cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+    }
+
+    /* 終末地工業戰術按鈕 */
+    .ef-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 28px;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-decoration: none;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .ef-btn-primary {
+      background: var(--ef-yellow);
+      color: #0b0d11;
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+      box-shadow: 0 4px 18px var(--ef-yellow-glow);
+    }
+
+    .ef-btn-primary:hover {
+      background: var(--ef-yellow-light);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(248, 175, 0, 0.4);
+    }
+
+    .ef-btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .ef-btn-outline {
+      background: rgba(27, 32, 44, 0.6);
+      color: var(--ef-text-primary);
+      border: 1px solid var(--ef-border-bright);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+    }
+
+    .ef-btn-outline:hover {
+      background: rgba(39, 47, 61, 0.9);
+      border-color: var(--ef-yellow);
+      color: var(--ef-yellow);
+    }
+
+    /* 個人照片與戰術 ID 卡模組 */
+    .operator-card-wrapper {
+      position: relative;
+      background: var(--ef-bg-card);
+      border: 1px solid var(--ef-border-subtle);
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    /* 戰術角落邊框裝飾 ┌ ┐ └ ┘ */
+    .corner-bracket {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-color: var(--ef-yellow);
+      pointer-events: none;
+    }
+    .cb-tl { top: -2px; left: -2px; border-top: 3px solid var(--ef-yellow); border-left: 3px solid var(--ef-yellow); }
+    .cb-tr { top: -2px; right: -2px; border-top: 3px solid var(--ef-yellow); border-right: 3px solid var(--ef-yellow); }
+    .cb-bl { bottom: -2px; left: -2px; border-bottom: 3px solid var(--ef-yellow); border-left: 3px solid var(--ef-yellow); }
+    .cb-br { bottom: -2px; right: -2px; border-bottom: 3px solid var(--ef-yellow); border-right: 3px solid var(--ef-yellow); }
+
+    .card-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--ef-border-subtle);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ef-text-dim);
+    }
+
+    .card-photo-frame {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      background: #0f131a;
+      overflow: hidden;
+      border: 1px solid var(--ef-border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .photo-scan-effect {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, var(--ef-cyan), transparent);
+      box-shadow: 0 0 12px var(--ef-cyan);
+      animation: photo-scan 3.5s infinite linear;
+      z-index: 20;
+    }
+
+    @keyframes photo-scan {
+      0% { top: 0; opacity: 0; }
+      10% { opacity: 0.9; }
+      90% { opacity: 0.9; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    /* 預設戰術頭像 SVG */
+    .avatar-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: filter 0.3s ease;
+    }
+
+    .avatar-vector-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #171c26 0%, #0d1017 100%);
+      color: var(--ef-text-secondary);
+      position: relative;
+    }
+
+    .avatar-watermark {
+      position: absolute;
+      font-family: var(--font-display);
+      font-size: 60px;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.03);
+      letter-spacing: 4px;
+      user-select: none;
+    }
+
+    .avatar-overlay-prompt {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      background: rgba(10, 13, 18, 0.85);
+      border: 1px solid var(--ef-border-bright);
+      padding: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ef-yellow);
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: opacity 0.2s;
+    }
+
+    .card-footer-data {
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .barcode-display {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--ef-text-dim);
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .barcode-lines {
+      height: 18px;
+      width: 90px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--ef-text-secondary),
+        var(--ef-text-secondary) 2px,
+        transparent 2px,
+        transparent 4px,
+        var(--ef-text-secondary) 4px,
+        var(--ef-text-secondary) 5px,
+        transparent 5px,
+        transparent 8px
+      );
+    }
+
+    .clearance-stamp {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ef-cyan);
+      border: 1px solid var(--ef-cyan);
+      padding: 2px 8px;
+      letter-spacing: 1px;
+    }
+
+    /* 隱藏的原生檔案上傳器 */
+    #photo-file-input {
+      display: none;
+    }
+
+    /* ==========================================================================
+       通用區塊樣式 (SECTION LAYOUT)
+       ========================================================================== */
+    .ef-section {
+      padding: 64px 0;
+      position: relative;
+    }
+
+    .section-header {
+      margin-bottom: 36px;
+      position: relative;
+    }
+
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ef-yellow);
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--ef-border-bright) 0%, transparent 100%);
+      margin-left: 12px;
+    }
+
+    /* ==========================================================================
+       ABOUT 區塊 (BIOGRAPHY 正文)
+       ========================================================================== */
+    .about-card {
+      background: var(--ef-bg-card);
+      border: 1px solid var(--ef-border-subtle);
+      position: relative;
+      padding: 36px 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 40px;
+    }
+
+    .about-bio-heading {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ef-yellow);
+      letter-spacing: 1.5px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .about-bio-text {
+      font-size: 16.5px;
+      line-height: 1.9;
+      color: #e1e7ee;
+      letter-spacing: 0.5px;
+      text-align: justify;
+      background: rgba(13, 16, 22, 0.4);
+      padding: 22px 24px;
+      border-left: 3px solid var(--ef-yellow);
+      margin-bottom: 20px;
+    }
+
+    .about-highlight-phrase {
+      color: var(--ef-yellow);
+      font-weight: 600;
+    }
+
+    .about-dossier-panel {
+      background: var(--ef-bg-panel);
+      border: 1px solid var(--ef-border-subtle);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .dossier-header {
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ef-cyan);
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--ef-border-subtle);
+      padding-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .dossier-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .dossier-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ef-text-dim);
+      letter-spacing: 1px;
+    }
+
+    .dossier-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ef-text-primary);
+    }
+
+    .dossier-value.accent {
+      color: var(--ef-yellow);
+      font-weight: 700;
+    }
+
+    /* ==========================================================================
+       專長區塊 (OPERATIONAL COMPETENCIES)
+       ========================================================================== */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .skill-card {
+      background: var(--ef-bg-card);
+      border: 1px solid var(--ef-border-subtle);
+      padding: 24px;
+      position: relative;
+      transition: all 0.25s ease;
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+    }
+
+    .skill-card:hover {
+      background: var(--ef-bg-card-hover);
+      border-color: var(--ef-yellow);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .skill-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .skill-code {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ef-yellow);
+      letter-spacing: 1px;
+    }
+
+    .skill-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 2px 7px;
+      border: 1px solid var(--ef-border-bright);
+      color: var(--ef-text-secondary);
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .skill-badge.highlight {
+      border-color: var(--ef-yellow);
+      color: var(--ef-yellow);
+      background: rgba(248, 175, 0, 0.1);
+    }
+
+    .skill-name {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .skill-desc {
+      font-size: 13.5px;
+      color: var(--ef-text-secondary);
+      line-height: 1.6;
+    }
+
+    .skill-meter {
+      margin-top: 16px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .skill-meter-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--ef-yellow), var(--ef-cyan));
+    }
+
+    /* 成就特裝模組 (第一名突出卡片) */
+    .achievement-card {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, rgba(248, 175, 0, 0.08) 0%, rgba(20, 25, 36, 0.95) 100%);
+      border: 1px solid rgba(248, 175, 0, 0.4);
+      padding: 24px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .achieve-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .achieve-rank-badge {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 900;
+      color: #0b0d11;
+      background: var(--ef-yellow);
+      width: 64px;
+      height: 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      clip-path: polygon(0 0, 100% 0, 80% 100%, 0% 100%);
+    }
+
+    .achieve-rank-badge span {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .achieve-info h4 {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .achieve-info p {
+      font-size: 14px;
+      color: var(--ef-text-secondary);
+    }
+
+    .achieve-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ef-yellow);
+      border: 1px solid var(--ef-yellow);
+      padding: 4px 10px;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    /* ==========================================================================
+       主 CTA & 聯絡終端 (CONTACT / CTA SECTION)
+       ========================================================================== */
+    .contact-card {
+      background: var(--ef-bg-card);
+      border: 1px solid var(--ef-border-subtle);
+      padding: 48px;
+      position: relative;
+      text-align: center;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .contact-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 3px;
+      background: var(--ef-yellow);
+    }
+
+    .contact-subtitle {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ef-cyan);
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .contact-heading {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+    }
+
+    .contact-description {
+      font-size: 16px;
+      color: var(--ef-text-secondary);
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+
+    .contact-action-box {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      background: rgba(10, 12, 16, 0.7);
+      border: 1px solid var(--ef-border-bright);
+      padding: 20px 32px;
+      max-width: 100%;
+    }
+
+    .email-display-text {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ef-yellow);
+      letter-spacing: 1px;
+      word-break: break-all;
+    }
+
+    .contact-buttons-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    /* ==========================================================================
+       頁尾 (FOOTER)
+       ========================================================================== */
+    .ef-footer {
+      border-top: 1px solid var(--ef-border-subtle);
+      background: #08090d;
+      padding: 36px 0 28px;
+      margin-top: 48px;
+    }
+
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .footer-title {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ef-text-primary);
+      letter-spacing: 1.5px;
+    }
+
+    .footer-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ef-text-dim);
+    }
+
+    .footer-right {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ef-text-secondary);
+      text-align: right;
+    }
+
+    .footer-right a {
+      color: var(--ef-yellow);
+      text-decoration: none;
+    }
+
+    .footer-right a:hover {
+      text-decoration: underline;
+    }
+
+    /* ==========================================================================
+       終末地戰術彈窗 (MODAL & TOAST)
+       ========================================================================== */
+    .ef-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 7, 10, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .ef-modal-backdrop.active {
+      display: flex;
+    }
+
+    .ef-modal {
+      background: var(--ef-bg-card);
+      border: 1px solid var(--ef-yellow);
+      max-width: 440px;
+      width: 100%;
+      padding: 28px;
+      position: relative;
+      box-shadow: 0 0 35px var(--ef-yellow-glow);
+    }
+
+    .modal-status-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ef-yellow);
+      letter-spacing: 1.5px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .modal-body {
+      font-size: 14.5px;
+      color: var(--ef-text-secondary);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .modal-close-btn {
+      width: 100%;
+    }
+
+    /* 戰術通知 Toast */
+    .ef-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #151a24;
+      border-left: 4px solid var(--ef-cyan);
+      border-top: 1px solid var(--ef-border-bright);
+      border-right: 1px solid var(--ef-border-bright);
+      border-bottom: 1px solid var(--ef-border-bright);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      z-index: 3000;
+      transform: translateY(120%);
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+
+    .ef-toast.show {
+      transform: translateY(0);
+    }
+
+    .toast-icon {
+      color: var(--ef-cyan);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .toast-text {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--ef-text-primary);
+      letter-spacing: 0.5px;
+    }
+
+    /* ==========================================================================
+       響應式設計 (RWD MEDIA QUERIES)
+       ========================================================================== */
+    @media (max-width: 992px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .card-photo-frame {
+        height: 320px;
+      }
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 68px;
+        left: 0;
+        right: 0;
+        background: #0d1017;
+        flex-direction: column;
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--ef-border-bright);
+      }
+      .nav-links.mobile-open {
+        display: flex;
+      }
+      .mobile-menu-btn {
+        display: block;
+      }
+      .hero-name {
+        font-size: 36px;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .hero-name .en-tag {
+        font-size: 16px;
+      }
+      .hero-identity {
+        font-size: 16px;
+      }
+      .hero-quick-data {
+        grid-template-columns: 1fr;
+      }
+      .about-card {
+        padding: 24px 20px;
+      }
+      .contact-card {
+        padding: 32px 20px;
+      }
+      .email-display-text {
+        font-size: 16px;
+      }
+      .achieve-left {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .achievement-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .footer-grid {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+      }
+      .footer-right {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 終末地戰術掃描線覆蓋層 -->
+  <div class="scanline-overlay"></div>
+
+  <!-- ==========================================================================
+       導覽列 (NAVBAR)
+       包含 Home、News、Tools、Games (News / Tools / Games 標示 Coming soon)
+       ========================================================================== -->
+  <header class="ef-header">
+    <div class="container nav-container">
+      <a href="#home" class="brand-logo" title="終末地工業 人事資料庫">
+        <div class="brand-symbol">EF</div>
+        <div class="brand-text">
+          <span class="brand-title">ENDFIELD</span>
+          <span class="brand-sub">OPERATOR ARCHIVE // 終末地工業</span>
+        </div>
+      </a>
+
+      <!-- 桌面導覽列 -->
+      <ul class="nav-links" id="mainNav">
+        <li class="nav-item">
+          <a href="#home" class="nav-link active">
+            <span>首頁</span>
+            <span style="font-family: var(--font-mono); font-size: 11px;">HOME</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="javascript:void(0)" class="nav-link" onclick="openComingSoonModal('News', '最新消息')">
+            <span>最新消息</span>
+            <span class="coming-soon-badge">Coming soon</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="javascript:void(0)" class="nav-link" onclick="openComingSoonModal('Tools', '實用工具')">
+            <span>實用工具</span>
+            <span class="coming-soon-badge">Coming soon</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="javascript:void(0)" class="nav-link" onclick="openComingSoonModal('Games', '遊戲專案')">
+            <span>遊戲專案</span>
+            <span class="coming-soon-badge">Coming soon</span>
+          </a>
+        </li>
+      </ul>
+
+      <div style="display: flex; align-items: center;">
+        <!-- 音效開關 (模擬終末地終端提示音) -->
+        <button class="sound-toggle-btn" id="soundToggle" onclick="toggleAudioEffect()" title="切換戰術音效">
+          <span id="soundStatusIcon">🔊</span>
+          <span id="soundStatusText">AUDIO: ON</span>
+        </button>
+
+        <!-- 手機漢堡選單按鈕 -->
+        <button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="切換選單">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 斑馬警示條紋裝飾 -->
+  <div class="hazard-stripe-strip"></div>
+
+  <main>
+    <!-- ==========================================================================
+         HERO 區塊
+         包含：姓名 (葉俸瑜) + 一句身份 + 主 CTA (聯絡我) + 個人照片戰術外框
+         ========================================================================== -->
+    <section class="hero-section" id="home">
+      <div class="container">
+        <div class="hero-grid">
+          
+          <!-- 左側：個人身份與快速資訊 -->
+          <div class="hero-left">
+            <div class="hero-meta-badge">
+              <span class="hero-meta-dot"></span>
+              <span>OPERATOR STATUS: ACTIVE // 在籍驗證完成</span>
+            </div>
+
+            <div class="hero-title-group">
+              <div class="hero-title-en">PERSONNEL ID: DMD-2024-YFY</div>
+              <h1 class="hero-name">
+                葉俸瑜
+                <span class="en-tag">YEH FENG-YU</span>
+              </h1>
+              
+              <!-- 一句身份 -->
+              <div class="hero-identity">
+                大同大學數位媒體設計學系 ｜ 互動設計與虛擬角色領域探索者
+                <span class="hero-identity-en">TATUNG UNIVERSITY - DEPT. OF DIGITAL MEDIA DESIGN</span>
+              </div>
+            </div>
+
+            <!-- Profile 提取之關鍵資訊數據卡 -->
+            <div class="hero-quick-data">
+              <div class="quick-data-item">
+                <span class="quick-data-label">現正就讀 // CURRENT AFFILIATION</span>
+                <span class="quick-data-val">大同大學 數位媒體設計學系</span>
+              </div>
+              <div class="quick-data-item">
+                <span class="quick-data-label">在學期程 // ACADEMIC TIMELINE</span>
+                <span class="quick-data-val">2024 入學 — 2028.07 預計畢業</span>
+              </div>
+              <div class="quick-data-item">
+                <span class="quick-data-label">個人特質 // ATTRIBUTES</span>
+                <span class="quick-data-val">樂觀負責・良好學習力</span>
+              </div>
+              <div class="quick-data-item">
+                <span class="quick-data-label">探索核心 // CORE FOCUS</span>
+                <span class="quick-data-val">互動設計・虛擬角色領域</span>
+              </div>
+            </div>
+
+            <!-- 主 CTA (聯絡我) 與快捷行動按鈕 -->
+            <div class="hero-cta-group">
+              <!-- 主 CTA: 聯絡我 (觸發平滑滾動至聯絡區並支援 mailto) -->
+              <a href="#contact" class="ef-btn ef-btn-primary" onclick="playBeepSound()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                <span>聯絡我 // CONTACT ME</span>
+              </a>
+
+              <!-- 次要按鈕：查看完整檔案 -->
+              <a href="#about" class="ef-btn ef-btn-outline" onclick="playBeepSound()">
+                <span>個人檔案 // ARCHIVE</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- 右側：個人照片模組 (具有終末地高科技戰術卡片外框) -->
+          <div class="hero-right">
+            <div class="operator-card-wrapper ef-cut-corner-br">
+              <!-- 戰術卡四角支架 -->
+              <div class="corner-bracket cb-tl"></div>
+              <div class="corner-bracket cb-tr"></div>
+              <div class="corner-bracket cb-bl"></div>
+              <div class="corner-bracket cb-br"></div>
+
+              <div class="card-top-bar">
+                <span>IDENTITY CARD // PROTOCOL_04</span>
+                <span style="color: var(--ef-yellow);">SYS.VER 2.4</span>
+              </div>
+
+              <!-- 照片相框 (支援點擊上傳更換本地照片即時預覽) -->
+              <div class="card-photo-frame" onclick="triggerPhotoUpload()" title="點擊可替換個人照片檔案進行預覽">
+                <div class="photo-scan-effect"></div>
+
+                <!-- 預設戰術頭像 (若更換圖片後將顯示使用者選擇的照片) -->
+                <div id="avatarPlaceholder" class="avatar-vector-placeholder">
+                  <div class="avatar-watermark">ENDFIELD</div>
+                  <!-- 科技幹員向量剪影圖標 -->
+                  <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity: 0.85; color: var(--ef-yellow);">
+                    <circle cx="12" cy="7" r="4"></circle>
+                    <path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"></path>
+                    <line x1="12" y1="3" x2="12" y2="1"></line>
+                    <line x1="8" y1="7" x2="16" y2="7"></line>
+                    <path d="M2 13h4M18 13h4"></path>
+                  </svg>
+                  <div style="margin-top: 14px; font-family: var(--font-display); font-size: 15px; font-weight: 700; color: #fff; letter-spacing: 1px;">
+                    葉俸瑜 // 個人照片
+                  </div>
+                  <div style="font-family: var(--font-mono); font-size: 11px; color: var(--ef-text-dim);">
+                    OPERATOR PORTRAIT
+                  </div>
+                  
+                  <div class="avatar-overlay-prompt">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <span>點擊此處可替換自訂照片預覽 (PNG / JPG)</span>
+                  </div>
+                </div>
+
+                <!-- 當上傳圖片後替換此 img -->
+                <img id="userAvatarImg" class="avatar-image" src="" alt="葉俸瑜 個人照片" style="display: none;">
+              </div>
+
+              <!-- 隱藏的檔案輸入框 -->
+              <input type="file" id="photo-file-input" accept="image/*" onchange="handlePhotoUpload(event)">
+
+              <div class="card-footer-data">
+                <div class="barcode-display">
+                  <div class="barcode-lines"></div>
+                  <span>DMD-2407</span>
+                </div>
+                <div class="clearance-stamp">OPERATOR ID: #01</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         ABOUT 區塊 (BIOGRAPHY 正文)
+         完整呈現規定之個人簡介與文字，禁止新增未授權經歷
+         ========================================================================== -->
+    <section class="ef-section" id="about">
+      <div class="container">
+        
+        <div class="section-header">
+          <div class="section-tag">
+            <span>// 01 ARCHIVE BIOGRAPHY</span>
+          </div>
+          <h2 class="section-title">
+            個人簡介
+            <span class="section-title-line"></span>
+          </h2>
+        </div>
+
+        <div class="about-card ef-cut-corner-br">
+          <div class="corner-bracket cb-tl"></div>
+          <div class="corner-bracket cb-br"></div>
+
+          <div class="about-grid">
+            <!-- 左側：Biography 規定正文 -->
+            <div class="about-main-content">
+              <div class="about-bio-heading">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                  <line x1="9" y1="20" x2="15" y2="20"></line>
+                  <line x1="12" y1="4" x2="12" y2="20"></line>
+                </svg>
+                <span>BIOGRAPHY RECORD // 檔案正文紀錄</span>
+              </div>
+
+              <!-- 依照 Personal Profile 嚴格提供之正文內容 -->
+              <p class="about-bio-text">
+                葉俸瑜目前就讀於<span class="about-highlight-phrase">大同大學數位媒體設計學系</span>，自 <span class="about-highlight-phrase">2024 年</span>入學，預計於 <span class="about-highlight-phrase">2028 年 7 月</span>畢業。<span class="about-highlight-phrase">性格樂觀負責、具備良好學習力</span>，對<span class="about-highlight-phrase">互動設計與虛擬角色領域</span>抱持高度興趣。在學期間曾於<span class="about-highlight-phrase">「遊戲設計(二)」課程取得第一名成績</span>，並熟悉 <span class="about-highlight-phrase">Unity 與 Adobe 系列軟體</span>等工具的操作應用，持續在數位媒體與互動內容領域進行實務探索。
+              </p>
+
+              <div style="font-family: var(--font-mono); font-size: 11px; color: var(--ef-text-dim); display: flex; align-items: center; gap: 8px;">
+                <span style="color: var(--ef-yellow);">●</span>
+                <span>AUTHENTICITY VERIFIED: ALL DATA MATCHES OFFICIAL RECORD</span>
+              </div>
+            </div>
+
+            <!-- 右側：檔案數據彙整面板 (嚴格對應提供之各欄位) -->
+            <div class="about-dossier-panel">
+              <div class="dossier-header">
+                <span>PERSONNEL METRICS</span>
+                <span>ARCHIVE #01</span>
+              </div>
+
+              <div class="dossier-row">
+                <span class="dossier-label">所屬學系 // DEPARTMENT</span>
+                <span class="dossier-value">大同大學 數位媒體設計學系</span>
+              </div>
+
+              <div class="dossier-row">
+                <span class="dossier-label">學程狀態 // ENROLLMENT</span>
+                <span class="dossier-value">2024 入學 — 2028.07 預計畢業</span>
+              </div>
+
+              <div class="dossier-row">
+                <span class="dossier-label">個人特質 // CHARACTERISTICS</span>
+                <span class="dossier-value">性格樂觀負責、具備良好學習力</span>
+              </div>
+
+              <div class="dossier-row">
+                <span class="dossier-label">領域興趣 // INTERESTS</span>
+                <span class="dossier-value">互動設計、虛擬角色領域</span>
+              </div>
+
+              <div class="dossier-row">
+                <span class="dossier-label">在學獲獎成績 // RECOGNITION</span>
+                <span class="dossier-value accent">「遊戲設計(二)」課程第一名</span>
+              </div>
+
+              <div class="dossier-row">
+                <span class="dossier-label">實務探索方向 // FIELD EXPLORATION</span>
+                <span class="dossier-value">數位媒體與互動內容實務探索</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         專長區塊 (OPERATIONAL COMPETENCIES)
+         從 Profile 嚴格抽出的關鍵字與工具，無任何未提供之項目
+         ========================================================================== -->
+    <section class="ef-section" id="skills">
+      <div class="container">
+        
+        <div class="section-header">
+          <div class="section-tag">
+            <span>// 02 OPERATIONAL COMPETENCIES</span>
+          </div>
+          <h2 class="section-title">
+            專長與核心技能
+            <span class="section-title-line"></span>
+          </h2>
+        </div>
+
+        <div class="skills-grid">
+          
+          <!-- 專長 1: Unity -->
+          <div class="skill-card">
+            <div class="skill-card-top">
+              <span class="skill-code">TOOL-01</span>
+              <span class="skill-badge highlight">工具操作應用</span>
+            </div>
+            <h3 class="skill-name">Unity</h3>
+            <p class="skill-desc">
+              熟悉 Unity 引擎之操作與實務應用，具備遊戲與互動專案之開發與製作實踐能力。
+            </p>
+            <div class="skill-meter">
+              <div class="skill-meter-fill" style="width: 85%;"></div>
+            </div>
+          </div>
+
+          <!-- 專長 2: Adobe 系列軟體 -->
+          <div class="skill-card">
+            <div class="skill-card-top">
+              <span class="skill-code">TOOL-02</span>
+              <span class="skill-badge highlight">工具操作應用</span>
+            </div>
+            <h3 class="skill-name">Adobe 系列軟體</h3>
+            <p class="skill-desc">
+              熟悉 Adobe 系列創作與數位媒體工具操作，應用於數位內容、視覺資產與介面素材處理。
+            </p>
+            <div class="skill-meter">
+              <div class="skill-meter-fill" style="width: 80%;"></div>
+            </div>
+          </div>
+
+          <!-- 專長 3: 互動設計 -->
+          <div class="skill-card">
+            <div class="skill-card-top">
+              <span class="skill-code">DOMAIN-01</span>
+              <span class="skill-badge">領域探索</span>
+            </div>
+            <h3 class="skill-name">互動設計</h3>
+            <p class="skill-desc">
+              對互動設計抱持高度興趣，持續在數位媒體與互動內容領域進行實務探索與介面互動研習。
+            </p>
+            <div class="skill-meter">
+              <div class="skill-meter-fill" style="width: 78%;"></div>
+            </div>
+          </div>
+
+          <!-- 專長 4: 虛擬角色領域 -->
+          <div class="skill-card">
+            <div class="skill-card-top">
+              <span class="skill-code">DOMAIN-02</span>
+              <span class="skill-badge">領域探索</span>
+            </div>
+            <h3 class="skill-name">虛擬角色領域</h3>
+            <p class="skill-desc">
+              對虛擬角色領域具備高度熱忱，聚焦角色表現力、數位形象塑造與虛擬載體之互動呈現。
+            </p>
+            <div class="skill-meter">
+              <div class="skill-meter-fill" style="width: 75%;"></div>
+            </div>
+          </div>
+
+          <!-- 專長 5: 數位媒體與互動內容 -->
+          <div class="skill-card">
+            <div class="skill-card-top">
+              <span class="skill-code">DOMAIN-03</span>
+              <span class="skill-badge">實務探索</span>
+            </div>
+            <h3 class="skill-name">數位媒體與互動內容</h3>
+            <p class="skill-desc">
+              結合數位媒體設計學系專業訓練，持續在互動內容與數位多媒體媒介開展實務製作實踐。
+            </p>
+            <div class="skill-meter">
+              <div class="skill-meter-fill" style="width: 82%;"></div>
+            </div>
+          </div>
+
+          <!-- 專長 6: 良好學習力與負責特質 -->
+          <div class="skill-card">
+            <div class="skill-card-top">
+              <span class="skill-code">TRAIT-01</span>
+              <span class="skill-badge">個人特質</span>
+            </div>
+            <h3 class="skill-name">樂觀負責・良好學習力</h3>
+            <p class="skill-desc">
+              具備良好的吸收與自學能力，能積極面對新工具與新技術挑戰，並以負責態度執行各項任務。
+            </p>
+            <div class="skill-meter">
+              <div class="skill-meter-fill" style="width: 90%;"></div>
+            </div>
+          </div>
+
+          <!-- 成就亮點卡：遊戲設計(二) 第一名 -->
+          <div class="achievement-card ef-cut-corner-br">
+            <div class="achieve-left">
+              <div class="achieve-rank-badge">
+                <span>RANK</span>
+                #01
+              </div>
+              <div class="achieve-info">
+                <h4>「遊戲設計(二)」課程第一名成績</h4>
+                <p>在學期間修習遊戲設計(二)課程表現優異，榮獲全班第一名殊榮，具備扎實專案落實成果。</p>
+              </div>
+            </div>
+            <div class="achieve-tag">ACADEMIC EXCELLENCE</div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         主 CTA 區塊 & 聯絡終端 (CONTACT / CTA SECTION)
+         包含：主 CTA (聯絡我) + 頁尾聯絡資訊 (Email: bigshit9487@gmail.com)
+         ========================================================================== -->
+    <section class="ef-section" id="contact">
+      <div class="container">
+        
+        <div class="contact-card ef-cut-corner-br">
+          <div class="corner-bracket cb-tl"></div>
+          <div class="corner-bracket cb-tr"></div>
+          <div class="corner-bracket cb-bl"></div>
+          <div class="corner-bracket cb-br"></div>
+
+          <div class="contact-subtitle">// DISPATCH & TRANSMISSION TERMINAL</div>
+          <h2 class="contact-heading">聯絡通訊終端</h2>
+          <p class="contact-description">
+            若您對互動設計、虛擬角色探索或專案合作有進一步交流意向，歡迎透過下方專用信箱進行通訊聯絡。
+          </p>
+
+          <div class="contact-action-box">
+            <div style="font-family: var(--font-mono); font-size: 11px; color: var(--ef-text-dim);">
+              OFFICIAL DISPATCH EMAIL // 官方信箱
+            </div>
+            <div class="email-display-text" id="targetEmail">
+              bigshit9487@gmail.com
+            </div>
+
+            <div class="contact-buttons-group">
+              <!-- 主要 CTA: 聯絡我 (開啟原生郵件軟體) -->
+              <a href="mailto:bigshit9487@gmail.com" class="ef-btn ef-btn-primary" onclick="playBeepSound()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                <span>發送郵件聯絡我 // SEND EMAIL</span>
+              </a>
+
+              <!-- 快捷複製 Email -->
+              <button class="ef-btn ef-btn-outline" onclick="copyEmailToClipboard()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>複製 Email 地址</span>
+              </button>
+            </div>
+          </div>
+
+          <div style="margin-top: 24px; font-family: var(--font-mono); font-size: 11px; color: var(--ef-text-dim);">
+            SYSTEM WILL ROUTE INQUIRIES DIRECTLY TO OPERATOR TERMINAL.
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       頁尾聯絡資訊 (FOOTER)
+       ========================================================================== -->
+  <footer class="ef-footer">
+    <div class="container footer-grid">
+      <div class="footer-left">
+        <div class="footer-title">葉俸瑜 YEH FENG-YU // 個人首頁</div>
+        <div class="footer-sub">大同大學 數位媒體設計學系 (2024 - 2028.07)</div>
+      </div>
+
+      <div class="footer-right">
+        <div>聯絡信箱：<a href="mailto:bigshit9487@gmail.com">bigshit9487@gmail.com</a></div>
+        <div style="color: var(--ef-text-dim); margin-top: 4px;">
+          VISUAL SYSTEM: ENDFIELD TACTICAL INTERFACE // ALL RIGHTS RESERVED
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       終末地戰術彈窗 (Coming Soon Modal)
+       點選 News / Tools / Games 時彈出
+       ========================================================================== -->
+  <div class="ef-modal-backdrop" id="comingSoonModal" onclick="closeComingSoonModal(event)">
+    <div class="ef-modal ef-cut-corner-br" onclick="event.stopPropagation()">
+      <div class="corner-bracket cb-tl"></div>
+      <div class="corner-bracket cb-tr"></div>
+      <div class="corner-bracket cb-bl"></div>
+      <div class="corner-bracket cb-br"></div>
+
+      <div class="modal-status-tag">
+        <span style="color: var(--ef-yellow);">▲</span>
+        <span id="modalCategoryTag">SYSTEM NOTICE // COMING SOON</span>
+      </div>
+
+      <h3 class="modal-title" id="modalTitle">模組建置中</h3>
+      <p class="modal-body" id="modalBody">
+        該模組尚在籌備建置中（Coming Soon），請稍候終末地後續通訊協定更新。
+      </p>
+
+      <button class="ef-btn ef-btn-primary modal-close-btn" onclick="closeComingSoonModal()">
+        確認並關閉 // CONFIRM
+      </button>
+    </div>
+  </div>
+
+  <!-- 戰術通知 Toast -->
+  <div class="ef-toast" id="tacticalToast">
+    <span class="toast-icon">✓</span>
+    <span class="toast-text" id="toastMessage">已複製信箱地址至剪貼簿！</span>
+  </div>
+
+  <!-- ==========================================================================
+       互動邏輯與音效系統 (JavaScript)
+       ========================================================================== -->
+  <script>
+    // --------------------------------------------------------------------------
+    // 1. Web Audio API 合成終末地風格戰術提示音 (無需外部音訊檔案)
+    // --------------------------------------------------------------------------
+    let audioEnabled = true;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          audioCtx = new AudioContext();
+        }
+      }
+    }
+
+    function playBeepSound(type = 'click') {
+      if (!audioEnabled) return;
+      try {
+        initAudio();
+        if (!audioCtx) return;
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'click') {
+          // 清脆高科技點擊音
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, now);
+          osc.frequency.exponentialRampToValueAtTime(1400, now + 0.05);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        } else if (type === 'confirm') {
+          // 戰術雙音確認
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.setValueAtTime(1040, now + 0.06);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
+          osc.start(now);
+          osc.stop(now + 0.14);
+        } else if (type === 'notice') {
+          // 警示音
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.setValueAtTime(330, now + 0.08);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.16);
+          osc.start(now);
+          osc.stop(now + 0.16);
+        }
+      } catch (e) {
+        console.warn('Audio play prevented', e);
+      }
+    }
+
+    function toggleAudioEffect() {
+      audioEnabled = !audioEnabled;
+      const icon = document.getElementById('soundStatusIcon');
+      const text = document.getElementById('soundStatusText');
+      if (audioEnabled) {
+        icon.textContent = '🔊';
+        text.textContent = 'AUDIO: ON';
+        playBeepSound('confirm');
+        showToast('戰術音效已開啟 // AUDIO ENABLED');
+      } else {
+        icon.textContent = '🔇';
+        text.textContent = 'AUDIO: OFF';
+        showToast('戰術音效已靜音 // AUDIO MUTED');
+      }
+    }
+
+    // --------------------------------------------------------------------------
+    // 2. 導覽列與 Coming Soon 彈窗互動
+    // --------------------------------------------------------------------------
+    function openComingSoonModal(sectionKey, sectionNameZh) {
+      playBeepSound('notice');
+      const modal = document.getElementById('comingSoonModal');
+      const tag = document.getElementById('modalCategoryTag');
+      const title = document.getElementById('modalTitle');
+      const body = document.getElementById('modalBody');
+
+      tag.textContent = `MODULE [${sectionKey.toUpperCase()}] // COMING SOON`;
+      title.textContent = `${sectionNameZh} (${sectionKey}) 模組建置中`;
+      body.textContent = `「${sectionNameZh}」功能模組目前正由終末地工程小組籌備開發中（Coming Soon），請稍候後續通訊協定更新發佈！`;
+
+      modal.classList.add('active');
+    }
+
+    function closeComingSoonModal(event) {
+      if (event && event.target !== event.currentTarget) return;
+      playBeepSound('click');
+      const modal = document.getElementById('comingSoonModal');
+      modal.classList.remove('active');
+    }
+
+    function toggleMobileNav() {
+      playBeepSound('click');
+      const nav = document.getElementById('mainNav');
+      nav.classList.toggle('mobile-open');
+    }
+
+    // --------------------------------------------------------------------------
+    // 3. 信箱複製功能與 Toast 提示
+    // --------------------------------------------------------------------------
+    function copyEmailToClipboard() {
+      const email = 'bigshit9487@gmail.com';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(email).then(() => {
+          playBeepSound('confirm');
+          showToast(`已複製信箱：${email}`);
+        }).catch(() => {
+          fallbackCopyText(email);
+        });
+      } else {
+        fallbackCopyText(email);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        playBeepSound('confirm');
+        showToast(`已複製信箱：${text}`);
+      } catch (err) {
+        alert('請手動複製信箱：' + text);
+      }
+      document.body.removeChild(textArea);
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const toast = document.getElementById('tacticalToast');
+      const toastText = document.getElementById('toastMessage');
+      toastText.textContent = msg;
+      toast.classList.add('show');
+      
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // --------------------------------------------------------------------------
+    // 4. 照片替換與本機預覽 (支援點擊照片直接更換展示)
+    // --------------------------------------------------------------------------
+    function triggerPhotoUpload() {
+      playBeepSound('click');
+      document.getElementById('photo-file-input').click();
+    }
+
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.getElementById('userAvatarImg');
+          const placeholder = document.getElementById('avatarPlaceholder');
+          img.src = e.target.result;
+          img.style.display = 'block';
+          placeholder.style.display = 'none';
+          playBeepSound('confirm');
+          showToast('個人照片已成功載入預覽！');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // 監聽鍵盤 ESC 關閉 Modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('comingSoonModal');
+        if (modal.classList.contains('active')) {
+          closeComingSoonModal();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
