@@ -454,6 +454,26 @@
       color: var(--ef-yellow);
     }
 
+    /* 玩我的小遊戲：青色高亮按鈕，與主要 CTA 區隔 */
+    .ef-btn-game {
+      background: var(--ef-cyan);
+      color: #041014;
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+      box-shadow: 0 4px 18px rgba(0, 240, 255, 0.3);
+    }
+
+    .ef-btn-game:hover,
+    .ef-btn-game:focus-visible {
+      background: #7bf8ff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(0, 240, 255, 0.5);
+      outline: none;
+    }
+
+    .ef-btn-game:active {
+      transform: translateY(0);
+    }
+
     /* 個人照片與戰術 ID 卡模組 */
     .operator-card-wrapper {
       position: relative;
@@ -495,6 +515,7 @@
       background: #0f131a;
       overflow: hidden;
       border: 1px solid var(--ef-border-subtle);
+      border-radius: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -525,6 +546,8 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center 25%;
+      border-radius: inherit;
       display: block;
       transition: filter 0.3s ease;
     }
@@ -1133,7 +1156,9 @@
         gap: 40px;
       }
       .card-photo-frame {
-        height: 320px;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        max-height: 420px;
       }
       .about-grid {
         grid-template-columns: 1fr;
@@ -1172,6 +1197,9 @@
       }
       .hero-quick-data {
         grid-template-columns: 1fr;
+      }
+      .hero-cta-group .ef-btn-game {
+        width: 100%;
       }
       .about-card {
         padding: 24px 20px;
@@ -1337,6 +1365,18 @@
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </a>
+
+              <!-- 小遊戲入口：貪食蛇 (game.html) -->
+              <a href="game.html" class="ef-btn ef-btn-game" onclick="playBeepSound()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <rect x="2" y="6" width="20" height="12" rx="4"></rect>
+                  <line x1="7" y1="10" x2="7" y2="14"></line>
+                  <line x1="5" y1="12" x2="9" y2="12"></line>
+                  <circle cx="16" cy="11" r="1"></circle>
+                  <circle cx="18.5" cy="13" r="1"></circle>
+                </svg>
+                <span>玩我的小遊戲</span>
+              </a>
             </div>
           </div>
 
@@ -1359,7 +1399,7 @@
                 <div class="photo-scan-effect"></div>
 
                 <!-- 預設戰術頭像 (若更換圖片後將顯示使用者選擇的照片) -->
-                <div id="avatarPlaceholder" class="avatar-vector-placeholder">
+                <div id="avatarPlaceholder" class="avatar-vector-placeholder" style="display: none;">
                   <div class="avatar-watermark">ENDFIELD</div>
                   <!-- 科技幹員向量剪影圖標 -->
                   <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity: 0.85; color: var(--ef-yellow);">
@@ -1386,8 +1426,9 @@
                   </div>
                 </div>
 
-                <!-- 當上傳圖片後替換此 img -->
-                <img id="userAvatarImg" class="avatar-image" src="" alt="葉俸瑜 個人照片" style="display: none;">
+                <!-- 個人照片 (images/me.jpg)；若找不到圖檔，自動退回上方預設戰術頭像 -->
+                <img id="userAvatarImg" class="avatar-image" src="images/me.jpg" alt="葉俸瑜"
+                     onerror="this.style.display='none';document.getElementById('avatarPlaceholder').style.display='flex';">
               </div>
 
               <!-- 隱藏的檔案輸入框 -->

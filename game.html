@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>貪食蛇</title>
+<style>
+  :root {
+    --g: #3dff7a;          /* 螢光綠 */
+    --g-dim: #17a04a;
+    --g-dark: #06331a;
+    --amber: #ffb43a;
+    --bg: #020805;
+    --board: clamp(200px, min(calc(100vw - 64px), calc(100vh - 250px)), 560px);
+  }
+  @supports (height: 100dvh) {
+    :root { --board: clamp(200px, min(calc(100vw - 64px), calc(100dvh - 250px)), 560px); }
+  }
+  /* 觸控按鈕出現時，預留下方空間 */
+  @media (hover: none), (pointer: coarse), (max-width: 700px) {
+    :root { --board: clamp(200px, min(calc(100vw - 64px), calc(100vh - 340px)), 560px); }
+    @supports (height: 100dvh) {
+      :root { --board: clamp(200px, min(calc(100vw - 64px), calc(100dvh - 340px)), 560px); }
+    }
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: radial-gradient(ellipse at center, #0b1a12 0%, #030906 70%, #000 100%);
+    color: var(--g);
+    font-family: "Noto Sans Mono CJK TC", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", "Courier New", monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overscroll-behavior: none;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* ---------- 頂端列 ---------- */
+  .topbar {
+    width: 100%;
+    padding: 10px 14px 0;
+    padding-top: max(10px, env(safe-area-inset-top));
+  }
+  .back {
+    display: inline-block;
+    color: var(--g);
+    text-decoration: none;
+    font-size: 16px;
+    padding: 6px 12px;
+    border: 1px solid var(--g-dim);
+    border-radius: 6px;
+    text-shadow: 0 0 6px var(--g);
+    background: rgba(61, 255, 122, .06);
+  }
+  .back:hover, .back:focus-visible { background: var(--g); color: #001a08; text-shadow: none; outline: none; }
+
+  .wrap {
+    width: 100%;
+    max-width: 680px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 4px 12px 14px;
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(22px, 5vw, 32px);
+    letter-spacing: .2em;
+    text-shadow: 0 0 8px var(--g), 0 0 22px rgba(61, 255, 122, .5);
+  }
+
+  .hud {
+    width: calc(var(--board) + 28px);
+    display: flex;
+    justify-content: space-between;
+    font-size: clamp(14px, 3.6vw, 18px);
+    text-shadow: 0 0 6px var(--g);
+  }
+  .hud b { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* ---------- CRT 螢幕 ---------- */
+  .monitor {
+    padding: 14px;
+    background: linear-gradient(145deg, #2b2f2c, #141715);
+    border-radius: 22px;
+    box-shadow: 0 0 0 2px #050706, 0 10px 40px rgba(0, 0, 0, .8), 0 0 60px rgba(61, 255, 122, .12);
+  }
+  .screen {
+    position: relative;
+    width: var(--board);
+    height: var(--board);
+    background: #01140a;
+    border-radius: 16px / 14px;
+    overflow: hidden;
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, .9), 0 0 24px rgba(61, 255, 122, .25);
+    animation: flicker 4s infinite;
+  }
+  .screen.shake { animation: shake .4s, flicker 4s infinite; }
+  canvas { width: 100%; height: 100%; display: block; }
+
+  .scan {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(to bottom, rgba(0, 0, 0, .3) 0 1px, transparent 1px 3px),
+      radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, .6) 100%);
+  }
+  .scan::after {
+    content: "";
+    position: absolute; left: 0; right: 0; height: 22%;
+    background: linear-gradient(to bottom, transparent, rgba(61, 255, 122, .07), transparent);
+    animation: roll 6s linear infinite;
+  }
+  @keyframes roll { from { top: -25%; } to { top: 110%; } }
+  @keyframes flicker {
+    0%, 100% { opacity: 1; } 47% { opacity: .97; } 50% { opacity: .93; } 53% { opacity: .98; }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translate(0); } 20% { transform: translate(-4px, 2px); }
+    40% { transform: translate(4px, -2px); } 60% { transform: translate(-3px, -2px); } 80% { transform: translate(3px, 2px); }
+  }
+
+  /* ---------- 覆蓋畫面 ---------- */
+  .overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: calc(var(--board) * .03);
+    background: rgba(0, 12, 5, .82);
+    text-align: center;
+    padding: 0 8%;
+  }
+  .overlay.hide { display: none; }
+  .overlay h2 {
+    margin: 0;
+    font-size: calc(var(--board) * .095);
+    letter-spacing: .15em;
+    text-shadow: 0 0 10px var(--g), 0 0 26px rgba(61, 255, 122, .6);
+  }
+  .overlay p {
+    margin: 0;
+    font-size: calc(var(--board) * .046);
+    line-height: 1.6;
+    text-shadow: 0 0 6px var(--g);
+  }
+  .overlay .new { color: var(--amber); text-shadow: 0 0 8px var(--amber); animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .btn {
+    font: inherit;
+    color: var(--g);
+    background: rgba(61, 255, 122, .08);
+    border: 2px solid var(--g);
+    border-radius: 8px;
+    padding: .5em 1.4em;
+    font-size: calc(var(--board) * .055);
+    letter-spacing: .1em;
+    cursor: pointer;
+    text-shadow: 0 0 6px var(--g);
+    box-shadow: 0 0 12px rgba(61, 255, 122, .35);
+  }
+  .btn:hover, .btn:focus-visible { background: var(--g); color: #001a08; text-shadow: none; outline: none; }
+  .btn:active { transform: scale(.97); }
+
+  /* ---------- 說明與觸控按鈕 ---------- */
+  .hint { font-size: 14px; color: var(--g-dim); text-align: center; line-height: 1.7; }
+  .hint kbd {
+    display: inline-block; padding: 0 .5em; border: 1px solid var(--g-dim); border-radius: 4px;
+    color: var(--g); font: inherit; background: rgba(61, 255, 122, .06);
+  }
+
+  .pad { display: none; width: calc(var(--board) + 28px); gap: 10px; }
+  .pad button {
+    font: inherit;
+    color: var(--g);
+    background: rgba(61, 255, 122, .08);
+    border: 2px solid var(--g-dim);
+    border-radius: 14px;
+    height: 76px;
+    font-size: 20px;
+    letter-spacing: .08em;
+    text-shadow: 0 0 6px var(--g);
+    touch-action: manipulation;
+  }
+  .pad button:active, .pad button.down { background: var(--g); color: #001a08; text-shadow: none; }
+  .pad .turn { flex: 3; }
+  .pad .mid { flex: 2; font-size: 17px; }
+  @media (hover: none), (pointer: coarse), (max-width: 700px) {
+    .pad { display: flex; }
+    .hint { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .screen, .screen.shake, .scan::after, .overlay .new { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="back" href="index.html">← 回首頁</a>
+</div>
+
+<main class="wrap">
+  <h1>貪 食 蛇</h1>
+
+  <div class="hud">
+    <span>分數：<b id="score">0</b></span>
+    <span>最高分：<b id="hi">0</b></span>
+  </div>
+
+  <div class="monitor">
+    <div class="screen" id="screen">
+      <canvas id="cv" width="480" height="480"></canvas>
+
+      <div class="overlay" id="overlay">
+        <h2 id="ovTitle">貪食蛇</h2>
+        <p id="ovText"></p>
+        <button class="btn" id="ovBtn" type="button">開始遊戲</button>
+      </div>
+
+      <div class="scan"></div>
+    </div>
+  </div>
+
+  <div class="hint">
+    <kbd>←</kbd> 左轉　<kbd>→</kbd> 右轉　<kbd>空白鍵</kbd> 開始／暫停<br>
+    吃到食物變長、加速；撞牆或撞到自己就結束
+  </div>
+
+  <div class="pad" id="pad">
+    <button class="turn" id="btnL" type="button" aria-label="左轉">◀ 左轉</button>
+    <button class="mid" id="btnMid" type="button">開始</button>
+    <button class="turn" id="btnR" type="button" aria-label="右轉">右轉 ▶</button>
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var COLS = 20, ROWS = 20, CELL = 24;
+  var DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];   // 上 右 下 左
+  var HI_KEY = 'snake_crt_hi';
+
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var elScore = document.getElementById('score');
+  var elHi = document.getElementById('hi');
+  var elScreen = document.getElementById('screen');
+  var overlay = document.getElementById('overlay');
+  var ovTitle = document.getElementById('ovTitle');
+  var ovText = document.getElementById('ovText');
+  var ovBtn = document.getElementById('ovBtn');
+  var btnMid = document.getElementById('btnMid');
+
+  var state = 'ready';        // ready | playing | paused | over
+  var snake, dir, queue, food, score, hi, interval, acc = 0, last = 0;
+
+  /* ---------- 最高分 ---------- */
+  function loadHi() {
+    try { return parseInt(localStorage.getItem(HI_KEY), 10) || 0; } catch (e) { return 0; }
+  }
+  function saveHi(v) {
+    try { localStorage.setItem(HI_KEY, String(v)); } catch (e) { /* 無法儲存就略過 */ }
+  }
+  hi = loadHi();
+  elHi.textContent = hi;
+
+  /* ---------- 遊戲流程 ---------- */
+  function reset() {
+    var cx = Math.floor(COLS / 2), cy = Math.floor(ROWS / 2);
+    snake = [{ x: cx, y: cy }, { x: cx - 1, y: cy }, { x: cx - 2, y: cy }];
+    dir = 1;
+    queue = [];
+    score = 0;
+    interval = 150;
+    acc = 0;
+    elScore.textContent = 0;
+    placeFood();
+  }
+
+  function placeFood() {
+    var free = [];
+    var taken = {};
+    for (var i = 0; i < snake.length; i++) taken[snake[i].x + ',' + snake[i].y] = true;
+    for (var y = 0; y < ROWS; y++)
+      for (var x = 0; x < COLS; x++)
+        if (!taken[x + ',' + y]) free.push({ x: x, y: y });
+    food = free.length ? free[Math.floor(Math.random() * free.length)] : null;
+  }
+
+  function startGame() {
+    reset();
+    state = 'playing';
+    last = performance.now();
+    syncUI();
+  }
+
+  function togglePause() {
+    if (state === 'playing') { state = 'paused'; }
+    else if (state === 'paused') { state = 'playing'; last = performance.now(); acc = 0; }
+    syncUI();
+  }
+
+  // 空白鍵／中間按鈕／覆蓋畫面按鈕：依目前狀態決定動作
+  function action() {
+    if (state === 'ready' || state === 'over') startGame();
+    else togglePause();
+  }
+
+  function turn(d) {   // d = +1 右轉、-1 左轉
+    if (state !== 'playing') return;
+    if (queue.length < 2) queue.push(d);
+  }
+
+  function step() {
+    if (queue.length) dir = (dir + queue.shift() + 4) % 4;
+
+    var h = snake[0];
+    var nx = h.x + DIRS[dir][0], ny = h.y + DIRS[dir][1];
+    if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS) return endGame(false);
+
+    var eating = food && nx === food.x && ny === food.y;
+    var limit = eating ? snake.length : snake.length - 1;   // 沒吃到時，尾巴會移開，可以踩過去
+    for (var i = 0; i < limit; i++) {
+      if (snake[i].x === nx && snake[i].y === ny) return endGame(false);
+    }
+
+    snake.unshift({ x: nx, y: ny });
+    if (eating) {
+      score += 10;
+      elScore.textContent = score;
+      interval = Math.max(65, interval - 3);
+      placeFood();
+      if (!food) return endGame(true);
+    } else {
+      snake.pop();
+    }
+  }
+
+  function endGame(win) {
+    state = 'over';
+    var record = score > hi;
+    if (record) { hi = score; saveHi(hi); elHi.textContent = hi; }
+    syncUI(win, record);
+    elScreen.classList.remove('shake');
+    void elScreen.offsetWidth;
+    elScreen.classList.add('shake');
+  }
+
+  /* ---------- 介面同步 ---------- */
+  function syncUI(win, record) {
+    overlay.classList.toggle('hide', state === 'playing');
+    if (state === 'ready') {
+      ovTitle.textContent = '貪食蛇';
+      ovText.innerHTML = '← 左轉　→ 右轉<br>吃食物變長，別撞到牆和自己';
+      ovBtn.textContent = '開始遊戲';
+      btnMid.textContent = '開始';
+    } else if (state === 'paused') {
+      ovTitle.textContent = '暫停中';
+      ovText.textContent = '按空白鍵繼續';
+      ovBtn.textContent = '繼續';
+      btnMid.textContent = '繼續';
+    } else if (state === 'over') {
+      ovTitle.textContent = win ? '全部吃光！' : '遊戲結束';
+      ovText.innerHTML = '分數：' + score + '<br>最高分：' + hi +
+        (record && score > 0 ? '<br><span class="new">★ 新紀錄 ★</span>' : '');
+      ovBtn.textContent = '重新開始';
+      btnMid.textContent = '重新開始';
+    } else {
+      btnMid.textContent = '暫停';
+    }
+  }
+
+  /* ---------- 繪圖 ---------- */
+  function drawCell(x, y, pad) {
+    ctx.fillRect(x * CELL + pad, y * CELL + pad, CELL - pad * 2, CELL - pad * 2);
+  }
+
+  function draw(t) {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+
+    // 淡淡的格點
+    ctx.fillStyle = 'rgba(61,255,122,.10)';
+    for (var gy = 0; gy < ROWS; gy++)
+      for (var gx = 0; gx < COLS; gx++)
+        ctx.fillRect(gx * CELL + CELL / 2 - 1, gy * CELL + CELL / 2 - 1, 2, 2);
+
+    // 食物（閃爍）
+    if (food) {
+      var a = 0.65 + 0.35 * Math.sin(t / 160);
+      ctx.shadowColor = '#ffb43a';
+      ctx.shadowBlur = 14;
+      ctx.fillStyle = 'rgba(255,180,58,' + a.toFixed(2) + ')';
+      drawCell(food.x, food.y, 5);
+      ctx.shadowBlur = 0;
+    }
+
+    // 蛇
+    ctx.shadowColor = '#3dff7a';
+    for (var i = snake.length - 1; i >= 0; i--) {
+      var s = snake[i];
+      if (i === 0) { ctx.shadowBlur = 16; ctx.fillStyle = '#c9ffd9'; drawCell(s.x, s.y, 1.5); }
+      else { ctx.shadowBlur = 8; ctx.fillStyle = i % 2 ? '#3dff7a' : '#2fe06a'; drawCell(s.x, s.y, 2); }
+    }
+    ctx.shadowBlur = 0;
+
+    // 邊框
+    ctx.strokeStyle = 'rgba(61,255,122,.5)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, cv.width - 2, cv.height - 2);
+  }
+
+  function loop(now) {
+    if (state === 'playing') {
+      acc += Math.min(now - last, 250);
+      while (acc >= interval && state === 'playing') { acc -= interval; step(); }
+    }
+    last = now;
+    draw(now);
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------- 操作 ---------- */
+  document.addEventListener('keydown', function (e) {
+    switch (e.code) {
+      case 'ArrowLeft': case 'KeyA':
+        e.preventDefault(); turn(-1); break;
+      case 'ArrowRight': case 'KeyD':
+        e.preventDefault(); turn(1); break;
+      case 'Space':
+        e.preventDefault();
+        if (!e.repeat) action();
+        break;
+    }
+  });
+  // 避免焦點在按鈕上時，空白鍵放開又被當成「點擊」而重複觸發
+  document.addEventListener('keyup', function (e) {
+    if (e.code === 'Space') e.preventDefault();
+  });
+
+  ovBtn.addEventListener('click', function () { action(); ovBtn.blur(); });
+
+  function bindPad(id, fn) {
+    var el = document.getElementById(id);
+    el.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      el.classList.add('down');
+      fn();
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) {
+      el.addEventListener(ev, function () { el.classList.remove('down'); });
+    });
+    el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    el.addEventListener('keydown', function (e) { if (e.code === 'Space') e.preventDefault(); });
+  }
+  bindPad('btnL', function () { turn(-1); });
+  bindPad('btnR', function () { turn(1); });
+  bindPad('btnMid', action);
+
+  // 切到別的分頁時自動暫停
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden && state === 'playing') togglePause();
+  });
+
+  reset();
+  syncUI();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
