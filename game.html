@@ -25,6 +25,7 @@
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  [hidden] { display: none !important; }
   html, body { margin: 0; height: 100%; }
   body {
     background: radial-gradient(ellipse at center, #0b1a12 0%, #030906 70%, #000 100%);
@@ -45,11 +46,15 @@
   /* ---------- 頂端列 ---------- */
   .topbar {
     width: 100%;
+    display: flex;
+    justify-content: space-between;
     padding: 10px 14px 0;
     padding-top: max(10px, env(safe-area-inset-top));
   }
   .back {
     display: inline-block;
+    font: inherit;
+    cursor: pointer;
     color: var(--g);
     text-decoration: none;
     font-size: 16px;
@@ -172,6 +177,72 @@
   }
   .btn:hover, .btn:focus-visible { background: var(--g); color: #001a08; text-shadow: none; outline: none; }
   .btn:active { transform: scale(.97); }
+  .btn:disabled { opacity: .5; cursor: default; transform: none; }
+  .btn.sm { font-size: clamp(13px, calc(var(--board) * .042), 20px); padding: .45em 1em; letter-spacing: .05em; }
+  .btn.ghost { border-color: var(--g-dim); box-shadow: none; }
+
+  .ov-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
+  /* ---------- 存分數 ---------- */
+  .save { display: flex; gap: 8px; width: 100%; max-width: 340px; }
+  .save input {
+    flex: 1;
+    min-width: 0;
+    font: inherit;
+    font-size: 16px;               /* 16px 以上，手機點輸入框才不會自動放大 */
+    color: var(--g);
+    background: rgba(0, 0, 0, .55);
+    border: 2px solid var(--g-dim);
+    border-radius: 8px;
+    padding: .35em .6em;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+  .save input::placeholder { color: var(--g-dim); }
+  .save input:focus { outline: none; border-color: var(--g); box-shadow: 0 0 10px rgba(61, 255, 122, .4); }
+  .overlay p.msg { font-size: clamp(12px, calc(var(--board) * .038), 18px); min-height: 1.6em; color: var(--g-dim); text-shadow: none; }
+  .overlay p.msg.ok { color: var(--amber); text-shadow: 0 0 6px var(--amber); }
+  .overlay p.msg.err { color: #ff6b6b; }
+
+  /* ---------- 排行榜視窗 ---------- */
+  .lb {
+    width: min(420px, calc(100vw - 32px));
+    max-height: calc(100vh - 32px);
+    padding: 20px 20px 18px;
+    color: var(--g);
+    background: #01140a;
+    border: 2px solid var(--g);
+    border-radius: 14px;
+    box-shadow: 0 0 40px rgba(61, 255, 122, .3);
+    font-family: inherit;
+  }
+  .lb::backdrop { background: rgba(0, 6, 2, .75); }
+  .lb h2 {
+    margin: 0 0 12px;
+    text-align: center;
+    font-size: 24px;
+    letter-spacing: .15em;
+    text-shadow: 0 0 10px var(--g);
+  }
+  .lb-status { margin: 10px 0; text-align: center; font-size: 15px; color: var(--g-dim); line-height: 1.6; }
+  .lb-status.err { color: #ff6b6b; }
+  .lb-status.mine { color: var(--amber); text-shadow: 0 0 6px var(--amber); }
+  .lb-list { list-style: none; margin: 0; padding: 0; font-size: 17px; }
+  .lb-list li {
+    display: grid;
+    grid-template-columns: 2.4em 1fr auto;
+    gap: 8px;
+    padding: 6px 10px;
+    border-bottom: 1px dashed rgba(61, 255, 122, .2);
+  }
+  .lb-list .rk { color: var(--g-dim); }
+  .lb-list .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; user-select: text; -webkit-user-select: text; }
+  .lb-list .sc { font-variant-numeric: tabular-nums; text-shadow: 0 0 6px var(--g); }
+  .lb-list li:nth-child(-n+3) .rk { color: var(--amber); text-shadow: 0 0 6px var(--amber); }
+  .lb-list li.me { background: rgba(255, 180, 58, .14); border-radius: 6px; color: var(--amber); }
+  .lb-list li.me .sc { text-shadow: 0 0 6px var(--amber); }
+  .lb .ov-row { margin-top: 16px; }
+  .lb .btn { font-size: 17px; }
 
   /* ---------- 說明與觸控按鈕 ---------- */
   .hint { font-size: 14px; color: var(--g-dim); text-align: center; line-height: 1.7; }
@@ -210,6 +281,7 @@
 
 <div class="topbar">
   <a class="back" href="index.html">← 回首頁</a>
+  <button class="back" id="lbTop" type="button">★ 排行榜</button>
 </div>
 
 <main class="wrap">
@@ -227,7 +299,16 @@
       <div class="overlay" id="overlay">
         <h2 id="ovTitle">貪食蛇</h2>
         <p id="ovText"></p>
-        <button class="btn" id="ovBtn" type="button">開始遊戲</button>
+        <form class="save" id="saveForm" hidden>
+          <input id="nick" type="text" maxlength="12" placeholder="輸入暱稱上排行榜"
+                 autocomplete="nickname" enterkeyhint="send" aria-label="暱稱">
+          <button class="btn sm" id="saveBtn" type="submit">儲存分數</button>
+        </form>
+        <p class="msg" id="saveMsg" hidden></p>
+        <div class="ov-row">
+          <button class="btn" id="ovBtn" type="button">開始遊戲</button>
+          <button class="btn sm ghost" id="lbOv" type="button">排行榜</button>
+        </div>
       </div>
 
       <div class="scan"></div>
@@ -236,7 +317,7 @@
 
   <div class="hint">
     <kbd>←</kbd> 左轉　<kbd>→</kbd> 右轉　<kbd>空白鍵</kbd> 開始／暫停<br>
-    吃到食物變長、加速；撞牆或撞到自己就結束
+    吃到食物變長、加速；撞牆或撞到自己就結束，結束後可存分數上排行榜
   </div>
 
   <div class="pad" id="pad">
@@ -246,6 +327,16 @@
   </div>
 </main>
 
+<dialog class="lb" id="lb" aria-labelledby="lbTitle">
+  <h2 id="lbTitle">排行榜 TOP 10</h2>
+  <p class="lb-status" id="lbStatus"></p>
+  <ol class="lb-list" id="lbList"></ol>
+  <div class="ov-row">
+    <button class="btn sm ghost" id="lbRetry" type="button" hidden>重新整理</button>
+    <button class="btn sm" id="lbClose" type="button">關閉</button>
+  </div>
+</dialog>
+
 <script>
 (function () {
   'use strict';
@@ -253,6 +344,10 @@
   var COLS = 20, ROWS = 20, CELL = 24;
   var DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];   // 上 右 下 左
   var HI_KEY = 'snake_crt_hi';
+  var NICK_KEY = 'snake_crt_nick';
+
+  // 雲端排行榜：貼上自己的 Apps Script 部署網址（結尾是 /exec）
+  var LEADERBOARD_URL = 'https://script.google.com/macros/s/AKfycbzzltWCEhpOivO0RMfiO1dcL2nzpMsLD7I2z8s1RwtNey0FdJhFYEj9PiIdJp-D1Q8/exec';
 
   var cv = document.getElementById('cv');
   var ctx = cv.getContext('2d');
@@ -264,9 +359,18 @@
   var ovText = document.getElementById('ovText');
   var ovBtn = document.getElementById('ovBtn');
   var btnMid = document.getElementById('btnMid');
+  var saveForm = document.getElementById('saveForm');
+  var nick = document.getElementById('nick');
+  var saveBtn = document.getElementById('saveBtn');
+  var saveMsg = document.getElementById('saveMsg');
+  var lb = document.getElementById('lb');
+  var lbStatus = document.getElementById('lbStatus');
+  var lbList = document.getElementById('lbList');
+  var lbRetry = document.getElementById('lbRetry');
 
   var state = 'ready';        // ready | playing | paused | over
   var snake, dir, queue, food, score, hi, interval, acc = 0, last = 0;
+  var round = 0;              // 第幾局；舊的一局送出的請求回來時，不要蓋掉新一局的畫面
 
   /* ---------- 最高分 ---------- */
   function loadHi() {
@@ -303,6 +407,7 @@
 
   function startGame() {
     reset();
+    round++;
     state = 'playing';
     last = performance.now();
     syncUI();
@@ -363,6 +468,8 @@
   /* ---------- 介面同步 ---------- */
   function syncUI(win, record) {
     overlay.classList.toggle('hide', state === 'playing');
+    saveForm.hidden = true;
+    setMsg('');
     if (state === 'ready') {
       ovTitle.textContent = '貪食蛇';
       ovText.innerHTML = '← 左轉　→ 右轉<br>吃食物變長，別撞到牆和自己';
@@ -379,10 +486,131 @@
         (record && score > 0 ? '<br><span class="new">★ 新紀錄 ★</span>' : '');
       ovBtn.textContent = '重新開始';
       btnMid.textContent = '重新開始';
+      if (!LEADERBOARD_URL) setMsg('（排行榜尚未設定網址）');
+      else if (score > 0) { saveForm.hidden = false; nick.disabled = saveBtn.disabled = false; }
+      else setMsg('吃到食物才能上排行榜');
     } else {
       btnMid.textContent = '暫停';
     }
   }
+
+  function setMsg(text, cls) {
+    saveMsg.hidden = !text;
+    saveMsg.textContent = text;
+    saveMsg.className = 'msg' + (cls ? ' ' + cls : '');
+  }
+
+  /* ---------- 雲端排行榜 ---------- */
+  // 不帶 payload = GET 讀前 10 名；帶 payload = POST 存分數
+  // POST 用 text/plain，瀏覽器才不會先送 OPTIONS 預檢（Apps Script 不支援）
+  function api(payload) {
+    if (!LEADERBOARD_URL) return Promise.reject(new Error('尚未設定排行榜網址'));
+    var opts = payload ? {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    } : {};
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, 20000);
+    opts.signal = ctrl.signal;
+
+    return fetch(LEADERBOARD_URL, opts)
+      .then(function (r) {
+        if (!r.ok) throw new Error('伺服器回應 ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        if (!data || !data.ok) throw new Error((data && data.error) || '回傳資料不正確');
+        return data;
+      })
+      .catch(function (err) {
+        if (err.name === 'AbortError') throw new Error('連線逾時，請再試一次');
+        if (err.name === 'SyntaxError') throw new Error('回傳的不是 JSON，請檢查 /exec 網址與部署設定');
+        if (err.name === 'TypeError') throw new Error('連不到排行榜，請檢查網路，或 Apps Script 存取權是否為「所有人」');
+        throw err;
+      })
+      .finally(function () { clearTimeout(timer); });
+  }
+
+  try { nick.value = localStorage.getItem(NICK_KEY) || ''; } catch (e) { /* 讀不到就留空 */ }
+
+  saveForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = nick.value.replace(/\s+/g, ' ').trim();
+    if (!name) { setMsg('請先輸入暱稱', 'err'); nick.focus(); return; }
+    nick.value = name;
+    try { localStorage.setItem(NICK_KEY, name); } catch (err) { /* 無法儲存就略過 */ }
+
+    var myRound = round;
+    nick.disabled = saveBtn.disabled = true;
+    setMsg('儲存中…（第一次可能要等幾秒）');
+    api({ name: name, score: score }).then(function (res) {
+      if (myRound !== round) return;
+      saveForm.hidden = true;
+      setMsg('已儲存！你是第 ' + res.place + ' 名', 'ok');
+      openBoard(res);
+    }, function (err) {
+      if (myRound !== round) return;
+      nick.disabled = saveBtn.disabled = false;
+      setMsg('儲存失敗：' + err.message, 'err');
+    });
+  });
+
+  var lbReq = 0;   // 只採用最後一次讀取的結果
+
+  // data 有值（剛存完分數）就直接顯示，不用再讀一次
+  function openBoard(data) {
+    if (state === 'playing') togglePause();
+    if (!lb.open) lb.showModal();
+    var id = ++lbReq;
+    if (data) return renderBoard(data.top, data.place);
+
+    lbRetry.hidden = true;
+    lbList.textContent = '';
+    setStatus('讀取中…');
+    api().then(function (res) {
+      if (id === lbReq) renderBoard(res.top, 0);
+    }, function (err) {
+      if (id !== lbReq) return;
+      setStatus('讀取失敗：' + err.message, 'err');
+      lbRetry.hidden = false;
+    });
+  }
+
+  function renderBoard(top, place) {
+    lbRetry.hidden = false;
+    lbList.textContent = '';
+    if (!top.length) return setStatus('還沒有人上榜，快來搶第一！');
+    setStatus(!place ? '' : place <= top.length ? '★ 你是第 ' + place + ' 名 ★' :
+      '你這次是第 ' + place + ' 名，再加油擠進前 10！', place ? 'mine' : '');
+    top.forEach(function (row, i) {
+      var li = document.createElement('li');
+      if (i + 1 === place) li.className = 'me';
+      [['rk', (i + 1) + '.'], ['nm', row.name], ['sc', row.score]].forEach(function (c) {
+        var span = document.createElement('span');
+        span.className = c[0];
+        span.textContent = c[1];   // 用 textContent，暱稱裡的 HTML 不會被執行
+        li.appendChild(span);
+      });
+      lbList.appendChild(li);
+    });
+  }
+
+  function setStatus(text, cls) {
+    lbStatus.hidden = !text;
+    lbStatus.textContent = text;
+    lbStatus.className = 'lb-status' + (cls ? ' ' + cls : '');
+  }
+
+  document.getElementById('lbTop').addEventListener('click', function () { openBoard(); });
+  document.getElementById('lbOv').addEventListener('click', function () { openBoard(); });
+  document.getElementById('lbClose').addEventListener('click', function () { lb.close(); });
+  lbRetry.addEventListener('click', function () { openBoard(); });
+  // 點視窗外面（背景）也能關閉
+  lb.addEventListener('click', function (e) {
+    var r = lb.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) lb.close();
+  });
 
   /* ---------- 繪圖 ---------- */
   function drawCell(x, y, pad) {
@@ -434,7 +662,11 @@
   }
 
   /* ---------- 操作 ---------- */
+  // 輸入暱稱或看排行榜時，按鍵交給輸入框／視窗，不控制遊戲
+  function typing(e) { return lb.open || e.target === nick; }
+
   document.addEventListener('keydown', function (e) {
+    if (typing(e)) return;
     switch (e.code) {
       case 'ArrowLeft': case 'KeyA':
         e.preventDefault(); turn(-1); break;
@@ -448,7 +680,7 @@
   });
   // 避免焦點在按鈕上時，空白鍵放開又被當成「點擊」而重複觸發
   document.addEventListener('keyup', function (e) {
-    if (e.code === 'Space') e.preventDefault();
+    if (e.code === 'Space' && !typing(e)) e.preventDefault();
   });
 
   ovBtn.addEventListener('click', function () { action(); ovBtn.blur(); });
