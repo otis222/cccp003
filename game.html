@@ -11,16 +11,18 @@
     --g-dark: #06331a;
     --amber: #ffb43a;
     --bg: #020805;
+    --scope: #04101a;      /* 雷達螢幕底色：深藍黑，和綠色蛇身拉開色相 */
+    --frame: 14px;
     --board: clamp(200px, min(calc(100vw - 64px), calc(100vh - 250px)), 560px);
   }
   @supports (height: 100dvh) {
     :root { --board: clamp(200px, min(calc(100vw - 64px), calc(100dvh - 250px)), 560px); }
   }
-  /* 觸控按鈕出現時，預留下方空間 */
+  /* 觸控按鈕出現時，預留下方十字鍵的空間 */
   @media (hover: none), (pointer: coarse), (max-width: 700px) {
-    :root { --board: clamp(200px, min(calc(100vw - 64px), calc(100vh - 340px)), 560px); }
+    :root { --frame: 8px; --board: clamp(200px, min(calc(100vw - 48px), calc(100vh - 350px)), 560px); }
     @supports (height: 100dvh) {
-      :root { --board: clamp(200px, min(calc(100vw - 64px), calc(100dvh - 340px)), 560px); }
+      :root { --board: clamp(200px, min(calc(100vw - 48px), calc(100dvh - 350px)), 560px); }
     }
   }
 
@@ -87,17 +89,20 @@
   }
 
   .hud {
-    width: calc(var(--board) + 28px);
+    width: calc(var(--board) + var(--frame) * 2);
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
     font-size: clamp(14px, 3.6vw, 18px);
     text-shadow: 0 0 6px var(--g);
   }
   .hud b { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .hud .boost { font-size: .85em; color: var(--g-dim); text-shadow: none; opacity: .6; letter-spacing: .08em; }
+  .hud .boost.on { color: var(--amber); opacity: 1; text-shadow: 0 0 8px var(--amber); }
 
-  /* ---------- CRT 螢幕 ---------- */
+  /* ---------- CRT 雷達螢幕 ---------- */
   .monitor {
-    padding: 14px;
+    padding: var(--frame);
     background: linear-gradient(145deg, #2b2f2c, #141715);
     border-radius: 22px;
     box-shadow: 0 0 0 2px #050706, 0 10px 40px rgba(0, 0, 0, .8), 0 0 60px rgba(61, 255, 122, .12);
@@ -106,31 +111,33 @@
     position: relative;
     width: var(--board);
     height: var(--board);
-    background: #01140a;
+    background: var(--scope);
     border-radius: 16px / 14px;
     overflow: hidden;
-    box-shadow: inset 0 0 40px rgba(0, 0, 0, .9), 0 0 24px rgba(61, 255, 122, .25);
+    box-shadow: inset 0 0 24px rgba(0, 0, 0, .6), 0 0 24px rgba(61, 255, 122, .25);
     animation: flicker 4s infinite;
+    touch-action: none;      /* 在畫面上滑動控制方向時，不要捲動頁面 */
   }
   .screen.shake { animation: shake .4s, flicker 4s infinite; }
   canvas { width: 100%; height: 100%; display: block; }
 
+  /* 掃描線與暗角調淡，角落也看得清楚蛇身 */
   .scan {
     position: absolute; inset: 0;
     pointer-events: none;
     background:
-      repeating-linear-gradient(to bottom, rgba(0, 0, 0, .3) 0 1px, transparent 1px 3px),
-      radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, .6) 100%);
+      repeating-linear-gradient(to bottom, rgba(0, 0, 0, .15) 0 1px, transparent 1px 3px),
+      radial-gradient(ellipse at center, transparent 62%, rgba(0, 0, 0, .25) 100%);
   }
   .scan::after {
     content: "";
     position: absolute; left: 0; right: 0; height: 22%;
-    background: linear-gradient(to bottom, transparent, rgba(61, 255, 122, .07), transparent);
+    background: linear-gradient(to bottom, transparent, rgba(61, 255, 122, .05), transparent);
     animation: roll 6s linear infinite;
   }
   @keyframes roll { from { top: -25%; } to { top: 110%; } }
   @keyframes flicker {
-    0%, 100% { opacity: 1; } 47% { opacity: .97; } 50% { opacity: .93; } 53% { opacity: .98; }
+    0%, 100% { opacity: 1; } 50% { opacity: .975; }
   }
   @keyframes shake {
     0%, 100% { transform: translate(0); } 20% { transform: translate(-4px, 2px); }
@@ -142,7 +149,7 @@
     position: absolute; inset: 0;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: calc(var(--board) * .03);
-    background: rgba(0, 12, 5, .82);
+    background: rgba(2, 10, 16, .84);
     text-align: center;
     padding: 0 8%;
   }
@@ -218,12 +225,13 @@
   }
   .lb::backdrop { background: rgba(0, 6, 2, .75); }
   .lb h2 {
-    margin: 0 0 12px;
+    margin: 0 0 4px;
     text-align: center;
     font-size: 24px;
     letter-spacing: .15em;
     text-shadow: 0 0 10px var(--g);
   }
+  .lb-rule { margin: 0 0 10px; text-align: center; font-size: 13px; color: var(--g-dim); }
   .lb-status { margin: 10px 0; text-align: center; font-size: 15px; color: var(--g-dim); line-height: 1.6; }
   .lb-status.err { color: #ff6b6b; }
   .lb-status.mine { color: var(--amber); text-shadow: 0 0 6px var(--amber); }
@@ -245,31 +253,46 @@
   .lb .btn { font-size: 17px; }
 
   /* ---------- 說明與觸控按鈕 ---------- */
-  .hint { font-size: 14px; color: var(--g-dim); text-align: center; line-height: 1.7; }
+  .hint { font-size: 14px; color: var(--g-dim); text-align: center; line-height: 1.8; }
   .hint kbd {
-    display: inline-block; padding: 0 .5em; border: 1px solid var(--g-dim); border-radius: 4px;
-    color: var(--g); font: inherit; background: rgba(61, 255, 122, .06);
+    display: inline-block; min-width: 1.6em; padding: 0 .35em; margin: 0 1px; border: 1px solid var(--g-dim); border-radius: 4px;
+    color: var(--g); font: inherit; background: rgba(61, 255, 122, .06); text-align: center;
   }
 
-  .pad { display: none; width: calc(var(--board) + 28px); gap: 10px; }
+  .pad { display: none; width: calc(var(--board) + var(--frame) * 2); gap: 10px; align-items: stretch; }
   .pad button {
     font: inherit;
     color: var(--g);
     background: rgba(61, 255, 122, .08);
     border: 2px solid var(--g-dim);
-    border-radius: 14px;
-    height: 76px;
+    border-radius: 12px;
+    padding: 0;
     font-size: 20px;
     letter-spacing: .08em;
     text-shadow: 0 0 6px var(--g);
     touch-action: manipulation;
   }
   .pad button:active, .pad button.down { background: var(--g); color: #001a08; text-shadow: none; }
-  .pad .turn { flex: 3; }
-  .pad .mid { flex: 2; font-size: 17px; }
+  /* 十字方向鍵：按哪個方向，蛇就往哪個方向走 */
+  .dpad {
+    --key: clamp(44px, 13vw, 54px);
+    display: grid;
+    grid-template-columns: repeat(3, var(--key));
+    grid-template-rows: repeat(3, var(--key));
+    gap: 4px;
+  }
+  .dpad .up { grid-area: 1 / 2; }
+  .dpad .left { grid-area: 2 / 1; }
+  .dpad .right { grid-area: 2 / 3; }
+  .dpad .down { grid-area: 3 / 2; }
+  .acts { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .acts button { flex: 1; font-size: 17px; }
+  .acts .boost-btn { color: var(--amber); border-color: var(--amber); background: rgba(255, 180, 58, .08); text-shadow: 0 0 6px var(--amber); }
+  .acts .boost-btn.down { background: var(--amber); color: #1a0f00; text-shadow: none; }
   @media (hover: none), (pointer: coarse), (max-width: 700px) {
     .pad { display: flex; }
     .hint { display: none; }
+    h1 { display: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -289,6 +312,7 @@
 
   <div class="hud">
     <span>分數：<b id="score">0</b></span>
+    <span class="boost" id="boostTag">» 加速</span>
     <span>最高分：<b id="hi">0</b></span>
   </div>
 
@@ -316,19 +340,27 @@
   </div>
 
   <div class="hint">
-    <kbd>←</kbd> 左轉　<kbd>→</kbd> 右轉　<kbd>空白鍵</kbd> 開始／暫停<br>
-    吃到食物變長、加速；撞牆或撞到自己就結束，結束後可存分數上排行榜
+    <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 或 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 往該方向走　按住 <kbd>Shift</kbd> 加速　<kbd>空白鍵</kbd> 開始／暫停<br>
+    吃到食物變長、變快；撞牆或撞到自己就結束，結束後可存分數上排行榜
   </div>
 
   <div class="pad" id="pad">
-    <button class="turn" id="btnL" type="button" aria-label="左轉">◀ 左轉</button>
-    <button class="mid" id="btnMid" type="button">開始</button>
-    <button class="turn" id="btnR" type="button" aria-label="右轉">右轉 ▶</button>
+    <div class="dpad" role="group" aria-label="方向鍵">
+      <button class="up" id="btnUp" type="button" aria-label="往上">▲</button>
+      <button class="left" id="btnLeft" type="button" aria-label="往左">◀</button>
+      <button class="right" id="btnRight" type="button" aria-label="往右">▶</button>
+      <button class="down" id="btnDown" type="button" aria-label="往下">▼</button>
+    </div>
+    <div class="acts">
+      <button id="btnMid" type="button">開始</button>
+      <button class="boost-btn" id="btnBoost" type="button">按住加速</button>
+    </div>
   </div>
 </main>
 
 <dialog class="lb" id="lb" aria-labelledby="lbTitle">
   <h2 id="lbTitle">排行榜 TOP 10</h2>
+  <p class="lb-rule">同一個暱稱只列最高分</p>
   <p class="lb-status" id="lbStatus"></p>
   <ol class="lb-list" id="lbList"></ol>
   <div class="ov-row">
@@ -342,18 +374,27 @@
   'use strict';
 
   var COLS = 20, ROWS = 20, CELL = 24;
-  var DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];   // 上 右 下 左
+  var DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];   // 0 上 1 右 2 下 3 左
+  var KEYS = { ArrowUp: 0, KeyW: 0, ArrowRight: 1, KeyD: 1, ArrowDown: 2, KeyS: 2, ArrowLeft: 3, KeyA: 3 };
+  var BOOST = 2;        // 加速倍率
+  var MIN_STEP = 40;    // 加速時每一步最短的毫秒數
   var HI_KEY = 'snake_crt_hi';
   var NICK_KEY = 'snake_crt_nick';
 
   // 雲端排行榜：貼上自己的 Apps Script 部署網址（結尾是 /exec）
   var LEADERBOARD_URL = 'https://script.google.com/macros/s/AKfycbzzltWCEhpOivO0RMfiO1dcL2nzpMsLD7I2z8s1RwtNey0FdJhFYEj9PiIdJp-D1Q8/exec';
 
+  // 畫面顏色：底色深藍黑；蛇頭近白、身體由亮綠漸暗到尾巴
+  var BG = '#04101a';
+  var HEAD = '#f0fff4';
+  var NECK = [77, 255, 143], TAIL = [34, 168, 90];
+
   var cv = document.getElementById('cv');
   var ctx = cv.getContext('2d');
   var elScore = document.getElementById('score');
   var elHi = document.getElementById('hi');
   var elScreen = document.getElementById('screen');
+  var boostTag = document.getElementById('boostTag');
   var overlay = document.getElementById('overlay');
   var ovTitle = document.getElementById('ovTitle');
   var ovText = document.getElementById('ovText');
@@ -368,9 +409,13 @@
   var lbList = document.getElementById('lbList');
   var lbRetry = document.getElementById('lbRetry');
 
+  var touchUI = !!(window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches);
+
   var state = 'ready';        // ready | playing | paused | over
   var snake, dir, queue, food, score, hi, interval, acc = 0, last = 0;
   var round = 0;              // 第幾局；舊的一局送出的請求回來時，不要蓋掉新一局的畫面
+  var shiftDown = false, padBoost = false, boostShown = false;
+  var prefetch = null, prefetchRound = -1;   // 結束時先讀排行榜，存分數時就不用等
 
   /* ---------- 最高分 ---------- */
   function loadHi() {
@@ -425,13 +470,18 @@
     else togglePause();
   }
 
-  function turn(d) {   // d = +1 右轉、-1 左轉
+  // 按哪個方向就往哪個方向走（不再以蛇頭為準左右轉）
+  function setDir(d) {
     if (state !== 'playing') return;
-    if (queue.length < 2) queue.push(d);
+    var prev = queue.length ? queue[queue.length - 1] : dir;
+    if (d === prev || d === (prev + 2) % 4) return;   // 同方向不用排隊；正後方會撞到自己，直接忽略
+    if (queue.length < 3) queue.push(d);              // 一步之內連按兩下（例如 ↑ 再 ←）也會依序執行
   }
 
+  function boosting() { return state === 'playing' && (shiftDown || padBoost); }
+
   function step() {
-    if (queue.length) dir = (dir + queue.shift() + 4) % 4;
+    if (queue.length) dir = queue.shift();
 
     var h = snake[0];
     var nx = h.x + DIRS[dir][0], ny = h.y + DIRS[dir][1];
@@ -459,6 +509,10 @@
     state = 'over';
     var record = score > hi;
     if (record) { hi = score; saveHi(hi); elHi.textContent = hi; }
+    if (LEADERBOARD_URL && score > 0) {
+      prefetch = api().catch(function () { return null; });
+      prefetchRound = round;
+    }
     syncUI(win, record);
     elScreen.classList.remove('shake');
     void elScreen.offsetWidth;
@@ -472,12 +526,14 @@
     setMsg('');
     if (state === 'ready') {
       ovTitle.textContent = '貪食蛇';
-      ovText.innerHTML = '← 左轉　→ 右轉<br>吃食物變長，別撞到牆和自己';
+      ovText.innerHTML = touchUI
+        ? '按十字鍵或在畫面上滑動<br>蛇就往那個方向走，按住「加速」衝刺'
+        : '方向鍵／WASD：往該方向走<br>按住 Shift 加速，空白鍵暫停';
       ovBtn.textContent = '開始遊戲';
       btnMid.textContent = '開始';
     } else if (state === 'paused') {
       ovTitle.textContent = '暫停中';
-      ovText.textContent = '按空白鍵繼續';
+      ovText.textContent = touchUI ? '按「繼續」接著玩' : '按空白鍵繼續';
       ovBtn.textContent = '繼續';
       btnMid.textContent = '繼續';
     } else if (state === 'over') {
@@ -532,6 +588,31 @@
       .finally(function () { clearTimeout(timer); });
   }
 
+  // 暱稱比對：不分大小寫、忽略多餘空白
+  function keyOf(name) {
+    var s = String(name == null ? '' : name);
+    if (s.normalize) s = s.normalize('NFKC');
+    return s.replace(/\s+/g, ' ').trim().toLowerCase();
+  }
+
+  // 同一個暱稱只留最高分，再取前 10 名
+  function bestOnly(rows) {
+    var at = {}, list = [];
+    (rows || []).forEach(function (r) {
+      var k = keyOf(r && r.name), s = Number(r && r.score) || 0;
+      if (!k) return;
+      if (!(k in at)) { at[k] = list.length; list.push({ name: String(r.name), score: s, key: k }); }
+      else if (s > list[at[k]].score) { list[at[k]].score = s; list[at[k]].name = String(r.name); }
+    });
+    list.sort(function (a, b) { return b.score - a.score; });
+    return list.slice(0, 10);
+  }
+
+  function placeOf(list, key) {
+    for (var i = 0; i < list.length; i++) if (list[i].key === key) return i + 1;
+    return 0;
+  }
+
   try { nick.value = localStorage.getItem(NICK_KEY) || ''; } catch (e) { /* 讀不到就留空 */ }
 
   saveForm.addEventListener('submit', function (e) {
@@ -541,14 +622,27 @@
     nick.value = name;
     try { localStorage.setItem(NICK_KEY, name); } catch (err) { /* 無法儲存就略過 */ }
 
-    var myRound = round;
+    var myRound = round, myScore = score, key = keyOf(name);
     nick.disabled = saveBtn.disabled = true;
     setMsg('儲存中…（第一次可能要等幾秒）');
-    api({ name: name, score: score }).then(function (res) {
+    var board = (prefetch && prefetchRound === round) ? prefetch : api().catch(function () { return null; });
+    board.then(function (res) {
+      var list = res ? bestOnly(res.top) : [];
+      var p = placeOf(list, key);
+      // 榜上已經有這個暱稱、分數也不比這次低：不再多存一筆，排行榜維持最高分
+      if (p && list[p - 1].score >= myScore) return { kept: true, top: res.top, best: list[p - 1].score };
+      return api({ name: name, score: myScore }).then(function (r) {
+        return { kept: false, top: r.top, place: r.place, unique: r.unique };
+      });
+    }).then(function (out) {
       if (myRound !== round) return;
       saveForm.hidden = true;
-      setMsg('已儲存！你是第 ' + res.place + ' 名', 'ok');
-      openBoard(res);
+      var list = bestOnly(out.top), p = placeOf(list, key);
+      if (out.kept) setMsg('這次 ' + myScore + ' 分，沒超過你的最高分 ' + out.best + ' 分，排行榜保留最高分', 'ok');
+      else setMsg(p ? '已儲存！你是第 ' + p + ' 名' : '已儲存！這次還沒擠進前 10', 'ok');
+      var status = p ? '★ 你目前第 ' + p + ' 名 ★' :
+        (out.unique && out.place ? '你這次是第 ' + out.place + ' 名，再加油擠進前 10！' : '再加油擠進前 10！');
+      openBoard({ top: out.top, key: key, status: status });
     }, function (err) {
       if (myRound !== round) return;
       nick.disabled = saveBtn.disabled = false;
@@ -563,13 +657,13 @@
     if (state === 'playing') togglePause();
     if (!lb.open) lb.showModal();
     var id = ++lbReq;
-    if (data) return renderBoard(data.top, data.place);
+    if (data) return renderBoard(data.top, data.key, data.status);
 
     lbRetry.hidden = true;
     lbList.textContent = '';
     setStatus('讀取中…');
     api().then(function (res) {
-      if (id === lbReq) renderBoard(res.top, 0);
+      if (id === lbReq) renderBoard(res.top, keyOf(nick.value), '');
     }, function (err) {
       if (id !== lbReq) return;
       setStatus('讀取失敗：' + err.message, 'err');
@@ -577,15 +671,15 @@
     });
   }
 
-  function renderBoard(top, place) {
+  function renderBoard(top, key, status) {
     lbRetry.hidden = false;
     lbList.textContent = '';
-    if (!top.length) return setStatus('還沒有人上榜，快來搶第一！');
-    setStatus(!place ? '' : place <= top.length ? '★ 你是第 ' + place + ' 名 ★' :
-      '你這次是第 ' + place + ' 名，再加油擠進前 10！', place ? 'mine' : '');
-    top.forEach(function (row, i) {
+    var list = bestOnly(top);
+    if (!list.length) return setStatus('還沒有人上榜，快來搶第一！');
+    setStatus(status || '', status ? 'mine' : '');
+    list.forEach(function (row, i) {
       var li = document.createElement('li');
-      if (i + 1 === place) li.className = 'me';
+      if (key && row.key === key) li.className = 'me';
       [['rk', (i + 1) + '.'], ['nm', row.name], ['sc', row.score]].forEach(function (c) {
         var span = document.createElement('span');
         span.className = c[0];
@@ -613,18 +707,25 @@
   });
 
   /* ---------- 繪圖 ---------- */
+  function shade(t) {   // t = 0 靠近蛇頭、1 尾巴
+    var c = [0, 1, 2].map(function (i) { return Math.round(NECK[i] + (TAIL[i] - NECK[i]) * t); });
+    return 'rgb(' + c.join(',') + ')';
+  }
+
   function drawCell(x, y, pad) {
     ctx.fillRect(x * CELL + pad, y * CELL + pad, CELL - pad * 2, CELL - pad * 2);
   }
 
   function draw(t) {
-    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.fillStyle = BG;
+    ctx.fillRect(0, 0, cv.width, cv.height);
 
-    // 淡淡的格點
-    ctx.fillStyle = 'rgba(61,255,122,.10)';
-    for (var gy = 0; gy < ROWS; gy++)
-      for (var gx = 0; gx < COLS; gx++)
-        ctx.fillRect(gx * CELL + CELL / 2 - 1, gy * CELL + CELL / 2 - 1, 2, 2);
+    // 雷達格線：每格一條細線，每 5 格一條亮一點的線
+    for (var g = 1; g < COLS; g++) {
+      ctx.fillStyle = g % 5 ? 'rgba(110,190,255,.07)' : 'rgba(110,190,255,.16)';
+      ctx.fillRect(g * CELL, 0, 1, cv.height);
+      ctx.fillRect(0, g * CELL, cv.width, 1);
+    }
 
     // 食物（閃爍）
     if (food) {
@@ -636,14 +737,30 @@
       ctx.shadowBlur = 0;
     }
 
-    // 蛇
-    ctx.shadowColor = '#3dff7a';
-    for (var i = snake.length - 1; i >= 0; i--) {
-      var s = snake[i];
-      if (i === 0) { ctx.shadowBlur = 16; ctx.fillStyle = '#c9ffd9'; drawCell(s.x, s.y, 1.5); }
-      else { ctx.shadowBlur = 8; ctx.fillStyle = i % 2 ? '#3dff7a' : '#2fe06a'; drawCell(s.x, s.y, 2); }
+    // 蛇身：每一節都和前一節連起來，看得出整條路徑；顏色由亮到暗，尾巴畫細
+    var n = snake.length;
+    for (var i = n - 1; i >= 1; i--) {
+      var s = snake[i], p = snake[i - 1];
+      var half = CELL / 2 - (i === n - 1 ? 6 : 3);
+      var x0 = Math.min(s.x, p.x) * CELL + CELL / 2, x1 = Math.max(s.x, p.x) * CELL + CELL / 2;
+      var y0 = Math.min(s.y, p.y) * CELL + CELL / 2, y1 = Math.max(s.y, p.y) * CELL + CELL / 2;
+      ctx.fillStyle = shade(n > 2 ? (i - 1) / (n - 2) : 0);
+      ctx.fillRect(x0 - half, y0 - half, x1 - x0 + half * 2, y1 - y0 + half * 2);
     }
+
+    // 蛇頭：近白色、較大，眼睛朝著前進方向
+    var h = snake[0], f = DIRS[dir];
+    ctx.shadowColor = '#3dff7a';
+    ctx.shadowBlur = 14;
+    ctx.fillStyle = HEAD;
+    drawCell(h.x, h.y, 1);
     ctx.shadowBlur = 0;
+    var hx = h.x * CELL + CELL / 2, hy = h.y * CELL + CELL / 2;
+    ctx.fillStyle = BG;
+    for (var k = -1; k <= 1; k += 2) {
+      var ex = hx + f[0] * 5 - f[1] * 5 * k, ey = hy + f[1] * 5 + f[0] * 5 * k;
+      ctx.fillRect(ex - 2, ey - 2, 4, 4);
+    }
 
     // 邊框
     ctx.strokeStyle = 'rgba(61,255,122,.5)';
@@ -654,9 +771,12 @@
   function loop(now) {
     if (state === 'playing') {
       acc += Math.min(now - last, 250);
-      while (acc >= interval && state === 'playing') { acc -= interval; step(); }
+      var ms = boosting() ? Math.max(MIN_STEP, interval / BOOST) : interval;
+      while (acc >= ms && state === 'playing') { acc -= ms; step(); }
     }
     last = now;
+    var b = boosting();
+    if (b !== boostShown) { boostShown = b; boostTag.classList.toggle('on', b); }
     draw(now);
     requestAnimationFrame(loop);
   }
@@ -667,44 +787,75 @@
 
   document.addEventListener('keydown', function (e) {
     if (typing(e)) return;
-    switch (e.code) {
-      case 'ArrowLeft': case 'KeyA':
-        e.preventDefault(); turn(-1); break;
-      case 'ArrowRight': case 'KeyD':
-        e.preventDefault(); turn(1); break;
-      case 'Space':
-        e.preventDefault();
-        if (!e.repeat) action();
-        break;
+    if (e.key === 'Shift') { shiftDown = true; return; }
+    if (Object.prototype.hasOwnProperty.call(KEYS, e.code)) {
+      e.preventDefault();
+      setDir(KEYS[e.code]);
+      return;
+    }
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (!e.repeat) action();
+    } else if (e.code === 'KeyP' && !e.repeat && (state === 'playing' || state === 'paused')) {
+      togglePause();
     }
   });
   // 避免焦點在按鈕上時，空白鍵放開又被當成「點擊」而重複觸發
   document.addEventListener('keyup', function (e) {
+    if (e.key === 'Shift') shiftDown = false;
     if (e.code === 'Space' && !typing(e)) e.preventDefault();
   });
+  window.addEventListener('blur', function () { shiftDown = padBoost = false; });
 
   ovBtn.addEventListener('click', function () { action(); ovBtn.blur(); });
 
-  function bindPad(id, fn) {
+  function bindPad(id, onDown, onUp) {
     var el = document.getElementById(id);
     el.addEventListener('pointerdown', function (e) {
       e.preventDefault();
       el.classList.add('down');
-      fn();
+      onDown();
     });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) {
-      el.addEventListener(ev, function () { el.classList.remove('down'); });
+      el.addEventListener(ev, function () {
+        el.classList.remove('down');
+        if (onUp) onUp();
+      });
     });
     el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
     el.addEventListener('keydown', function (e) { if (e.code === 'Space') e.preventDefault(); });
   }
-  bindPad('btnL', function () { turn(-1); });
-  bindPad('btnR', function () { turn(1); });
+  bindPad('btnUp', function () { setDir(0); });
+  bindPad('btnRight', function () { setDir(1); });
+  bindPad('btnDown', function () { setDir(2); });
+  bindPad('btnLeft', function () { setDir(3); });
   bindPad('btnMid', action);
+  bindPad('btnBoost', function () { padBoost = true; }, function () { padBoost = false; });
+
+  // 手機：在遊戲畫面上滑動，往滑的方向走；手指不放開也能連續轉彎
+  var swipe = null;
+  elScreen.addEventListener('pointerdown', function (e) {
+    if (e.pointerType === 'mouse' || state !== 'playing') return;
+    swipe = { id: e.pointerId, x: e.clientX, y: e.clientY };
+  });
+  elScreen.addEventListener('pointermove', function (e) {
+    if (!swipe || e.pointerId !== swipe.id) return;
+    var dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 22) return;
+    setDir(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
+    swipe.x = e.clientX;
+    swipe.y = e.clientY;
+  });
+  ['pointerup', 'pointercancel'].forEach(function (ev) {
+    elScreen.addEventListener(ev, function () { swipe = null; });
+  });
 
   // 切到別的分頁時自動暫停
   document.addEventListener('visibilitychange', function () {
-    if (document.hidden && state === 'playing') togglePause();
+    if (document.hidden) {
+      shiftDown = padBoost = false;
+      if (state === 'playing') togglePause();
+    }
   });
 
   reset();
