@@ -382,6 +382,14 @@ html.gl-on .fx-planet{display:none}
 .sec-idx{align-self:end;font:400 12px/1 var(--f-mono);color:var(--ink-3);white-space:nowrap}
 .sec-idx b{color:var(--ink);font-weight:700}
 .sec-sub{grid-column:2 / -1;max-width:42em;color:var(--ink-2);font-size:15px}
+/* a second part inside the same panel (02 · project channels) */
+.sub-sec{margin-top:clamp(48px,6vw,80px);scroll-margin-top:calc(var(--hud-h) + 52px)}
+.sub-head{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:end;gap:10px clamp(18px,3vw,34px);padding:clamp(18px,2.4vw,26px) 0 18px;margin-bottom:clamp(20px,3vw,32px);border-top:1.5px solid var(--ink);border-bottom:1px dashed var(--rule)}
+.sub-head .eyebrow{grid-column:1 / -1}
+.sub-head h3{font:900 clamp(26px,2.8vw,36px)/1.05 var(--f-cjk);letter-spacing:.01em;word-break:keep-all}
+.sub-head h3 em{font:700 .5em/1 var(--f-display);font-style:normal;letter-spacing:.12em;margin-left:10px;color:var(--ink-2);vertical-align:.25em}
+.sub-head .sec-sub{grid-column:auto;justify-self:end;max-width:34em}
+@media (max-width:760px){.sub-head{grid-template-columns:minmax(0,1fr)}.sub-head .sec-sub{justify-self:start}}
 
 /* ---------- 01 profile ---------- */
 .profile{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(28px,5vw,72px)}
@@ -786,7 +794,7 @@ const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const HOVER = matchMedia('(hover: hover) and (pointer: fine)').matches;
-const SECTIONS = [['profile', '01', '檔案', 'PROFILE'], ['modules', '02', '模組', 'MODULES'], ['projects', '03', '項目', 'PROJECTS'], ['contact', '04', '通訊', 'CONTACT']];
+const SECTIONS = [['profile', '01', '檔案', 'PROFILE'], ['modules', '02', '模組', 'MODULES'], ['contact', '03', '通訊', 'CONTACT']];
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* storage unavailable */ } },
@@ -1028,7 +1036,7 @@ function gauge(id, label) {
 function secHead(id, n, eyebrow, zh, en, sub) {
   return '<header class="sec-head"><p class="sec-num" aria-hidden="true">' + n + '</p>' +
     '<div class="sec-titles"><p class="eyebrow">' + burst + eyebrow + '</p><h2 id="h-' + id + '">' + zh + '<em>' + en + '</em></h2></div>' +
-    '<p class="sec-idx" aria-hidden="true"><b>' + n + '</b> / 04</p>' + (sub ? '<p class="sec-sub">' + sub + '</p>' : '') + '</header>';
+    '<p class="sec-idx" aria-hidden="true"><b>' + n + '</b> / ' + String(SECTIONS.length).padStart(2, '0') + '</p>' + (sub ? '<p class="sec-sub">' + sub + '</p>' : '') + '</header>';
 }
 
 function renderApp() {
@@ -1117,22 +1125,21 @@ function renderApp() {
       '</div>' +
     '</section>' +
 
-    /* 02 modules */
-    '<section class="sheet" id="modules" aria-labelledby="h-modules"><span class="sheet-tab">SEC. 02 <span>模組</span></span>' + screws +
+    /* 02 modules — the project channels sit in the same panel, right under the modules */
+    '<section class="sheet" id="modules" aria-labelledby="h-modules"><span class="sheet-tab">SEC. 02 <span>模組・項目</span></span>' + screws +
       secHead('modules', '02', 'Section 02 · Skills', '技能模組', 'MODULES', '八個正在運作的模組。標籤標示的是現在的投入程度：實戰中、研究中、練習中。') +
       '<div class="mods">' + P.modules.map(m => '<article class="mod"><header><span class="mod-code">' + m.code + '</span>' + pill(m.st) + '</header><h3><span class="en">' + esc(m.en) + '</span><span class="zh">' + esc(m.zh) + '</span></h3><p>' + esc(m.d) + '</p><ul class="tags" aria-label="工具">' + m.tags.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul></article>').join('') + '</div>' +
-    '</section>' +
-
-    /* 03 projects */
-    '<section class="sheet" id="projects" aria-labelledby="h-projects"><span class="sheet-tab">SEC. 03 <span>項目</span></span>' + screws +
-      secHead('projects', '03', 'Section 03 · Missions', '項目頻道', 'PROJECTS', '每個項目都有自己的任務徽章。訊號滿格的頻道可以直接接通，其餘的還在開發或整理中。') +
+      '<section class="sub-sec" id="projects" aria-labelledby="h-projects">' +
+        '<header class="sub-head"><p class="eyebrow">' + burst + 'Section 02 · Missions</p><h3 id="h-projects">項目頻道<em>PROJECTS</em></h3>' +
+          '<p class="sec-sub">每個項目都有自己的任務徽章。訊號滿格的頻道可以直接接通，其餘的還在開發或整理中。</p></header>' +
       '<div id="proj-feat">' + featured(P.projects[0], CUR) + '</div>' +
       '<div class="chs" id="proj-grid">' + P.projects.slice(1).map(p => channelCard(p, CUR)).join('') + '</div>' +
+      '</section>' +
     '</section>' +
 
-    /* 04 contact */
-    '<section class="sheet" id="contact" aria-labelledby="h-contact"><span class="sheet-tab">SEC. 04 <span>通訊</span></span>' + screws +
-      secHead('contact', '04', 'Section 04 · Correspondence', '聯絡方式', 'CONTACT') +
+    /* 03 contact */
+    '<section class="sheet" id="contact" aria-labelledby="h-contact"><span class="sheet-tab">SEC. 03 <span>通訊</span></span>' + screws +
+      secHead('contact', '03', 'Section 03 · Correspondence', '聯絡方式', 'CONTACT') +
       '<div class="dispatch">' +
         '<div><p class="lede">想聊遊戲開發、技術美術、互動設計，或有合作機會，歡迎直接來信。</p>' +
           '<div class="airmail">' + postmark() + '<span class="label">Par Avion · 航空郵件</span><output class="mail-addr" id="mail-addr" data-tx-off>' + esc(CUR.email) + '</output>' +
@@ -2294,7 +2301,7 @@ function bindUI() {
   });
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) setCurrent(e.target.id); }); }, { rootMargin: '-42% 0px -52% 0px' });
-    ['top', 'profile', 'modules', 'projects', 'contact'].forEach(id => { const el = document.getElementById(id); if (el) io.observe(el); });
+    ['top', 'profile', 'modules', 'contact'].forEach(id => { const el = document.getElementById(id); if (el) io.observe(el); });
   }
   addEventListener('scroll', () => { readScroll(); if (REDUCED) settle(); }, { passive: true });
   addEventListener('resize', () => { readScroll(); placeStations(); GL.resize(); if (REDUCED) settle(); }, { passive: true });
