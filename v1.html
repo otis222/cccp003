@@ -12,7 +12,8 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>葉俸瑜 | 個人檔案 - ENDFIELD OPERATOR RECORD</title>
+  <title>個人網站 v1（封存）｜葉俸瑜 YFY Lab</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%23EEE5D0'/%3E%3Cpolygon points='20,5 33,12.5 33,27.5 20,35 7,27.5 7,12.5' fill='none' stroke='%23211A16' stroke-width='2.6' stroke-linejoin='round'/%3E%3Cpath d='M20 5L13.5 24H26.5Z M13.5 24L20 35L26.5 24' fill='none' stroke='%23211A16' stroke-width='1.6' stroke-linejoin='round'/%3E%3Ccircle cx='20' cy='18' r='3.6' fill='%23E0522A'/%3E%3C/svg%3E">
   
   <!-- Google Fonts: Chakra Petch (Endfield sci-fi vibe) & Noto Sans TC -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1227,15 +1228,36 @@
         text-align: left;
       }
     }
+
+    /* 封存說明列與回首頁按鈕（新版網站的配色） */
+    .archive-bar {
+      position: relative; z-index: 1001;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 14px;
+      padding: 10px 16px; background: #EEE5D0; color: #211A16; border-bottom: 1.5px solid #211A16;
+      font: 500 14px/1.5 'Noto Sans TC', sans-serif; text-align: center;
+    }
+    .archive-bar a, .home-pill {
+      display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px 5px;
+      border: 1.5px solid #211A16; border-radius: 999px; background: #F7F1E2; color: #211A16;
+      font: 700 14px/1.2 'Noto Sans TC', sans-serif; text-decoration: none;
+    }
+    .archive-bar a:hover, .home-pill:hover { background: #211A16; color: #F7F1E2; }
+    .home-pill { position: fixed; left: 16px; bottom: 16px; z-index: 2500; box-shadow: 4px 5px 0 -1px rgba(0, 0, 0, .35); }
   </style>
 </head>
 <body>
+  <!-- 這一頁是上一版的個人網站，保留作為紀錄 -->
+  <div class="archive-bar" role="note">
+    <span>這是上一版的個人網站，保留作為紀錄。</span>
+    <a href="index.html">← 回到首頁</a>
+  </div>
+  <a class="home-pill" href="index.html">← 回首頁</a>
   <!-- 終末地戰術掃描線覆蓋層 -->
   <div class="scanline-overlay"></div>
 
   <!-- ==========================================================================
        導覽列 (NAVBAR)
-       包含 Home、News、Tools、Games (News / Tools / Games 標示 Coming soon)
+       包含 Home
        ========================================================================== -->
   <header class="ef-header">
     <div class="container nav-container">
@@ -1253,24 +1275,6 @@
           <a href="#home" class="nav-link active">
             <span>首頁</span>
             <span style="font-family: var(--font-mono); font-size: 11px;">HOME</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="javascript:void(0)" class="nav-link" onclick="openComingSoonModal('News', '最新消息')">
-            <span>最新消息</span>
-            <span class="coming-soon-badge">Coming soon</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="javascript:void(0)" class="nav-link" onclick="openComingSoonModal('Tools', '實用工具')">
-            <span>實用工具</span>
-            <span class="coming-soon-badge">Coming soon</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="javascript:void(0)" class="nav-link" onclick="openComingSoonModal('Games', '遊戲專案')">
-            <span>遊戲專案</span>
-            <span class="coming-soon-badge">Coming soon</span>
           </a>
         </li>
       </ul>
@@ -1399,7 +1403,7 @@
                 <div class="photo-scan-effect"></div>
 
                 <!-- 預設戰術頭像 (若更換圖片後將顯示使用者選擇的照片) -->
-                <div id="avatarPlaceholder" class="avatar-vector-placeholder" style="display: none;">
+                <div id="avatarPlaceholder" class="avatar-vector-placeholder">
                   <div class="avatar-watermark">ENDFIELD</div>
                   <!-- 科技幹員向量剪影圖標 -->
                   <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity: 0.85; color: var(--ef-yellow);">
@@ -1426,9 +1430,8 @@
                   </div>
                 </div>
 
-                <!-- 個人照片 (images/me.jpg)；若找不到圖檔，自動退回上方預設戰術頭像 -->
-                <img id="userAvatarImg" class="avatar-image" src="images/me.jpg" alt="葉俸瑜"
-                     onerror="this.style.display='none';document.getElementById('avatarPlaceholder').style.display='flex';">
+                <!-- 自訂照片預覽（點擊相框選擇圖片） -->
+                <img id="userAvatarImg" class="avatar-image" alt="葉俸瑜" style="display: none;">
               </div>
 
               <!-- 隱藏的檔案輸入框 -->
