@@ -615,6 +615,15 @@ html.dev-on #yfy-app :is(main,.hud-top,.hud-bot) *{cursor:text!important;-webkit
 .cs-tx-btns{display:flex;flex-direction:column;gap:6px}
 .cs-tx-btns button{min-height:32px;padding:6px 11px 5px;border:1.5px solid var(--rule);border-radius:999px;background:var(--paper-2);color:var(--ink);font:700 12px/1 var(--f-cjk);cursor:pointer;white-space:nowrap}
 .cs-tx-btns button:hover{border-color:var(--ink)}
+.cs-gh-state{font-size:13.5px;line-height:1.6;color:var(--ink-2)}
+.cs-gh-state.on{color:var(--tens-tx);font-weight:700}
+.cs-gh-steps{display:grid;gap:6px;padding-left:1.35em;list-style:decimal;font-size:13.5px;line-height:1.6}
+.cs-gh-steps b{font-weight:700}
+.cs-gh-row{display:flex;flex-wrap:wrap;gap:8px}
+.dev-count.busy{color:var(--ink-2)}
+.dev-count.ok{color:var(--tens-tx)}
+.dev-count.err{color:var(--acc-tx)}
+.dev-bar .btn:disabled,.console-actions .btn:disabled{opacity:.55;cursor:progress}
 .cs-tx li.empty{display:block;border-style:dashed;font-size:13px;line-height:1.6;color:var(--ink-2)}
 @media (max-width:760px){
   .dev-fab{bottom:calc(74px + env(safe-area-inset-bottom,0px))}
@@ -818,6 +827,7 @@ function readData() {
 }
 const DATA = readData();
 let CUR = DATA;
+let BASE = DATA;   // what is live on the site; edits are measured against this
 
 function cleanUrl(raw) {
   let u = String(raw || '').trim();
@@ -1093,7 +1103,16 @@ function renderApp() {
       '<p class="hint">開啟開發者模式後，點頁面上的任何文字就能直接改；這裡列出所有改過的地方，可以逐筆還原。</p>' +
       '<div class="cs-tx-actions"><button class="btn btn--sm btn--solid" type="button" id="cs-dev">' + PENCIL + '開啟開發者模式</button><button class="btn btn--sm btn--ghost" type="button" id="cs-tx-clear">全部還原</button></div>' +
       '<ol class="cs-tx" id="cs-tx"></ol></section>' +
-    '<footer class="console-actions"><button class="btn btn--solid" type="button" id="cs-publish">發布到網站 <em>PUBLISH</em></button><button class="btn" type="button" id="cs-export">下載 index.html</button><p class="cs-status" id="cs-status" role="status" aria-live="polite"></p></footer>' +
+    '<section class="cs-block" id="cs-gh-block" hidden><h3>發布到 GitHub · PUBLISH</h3>' +
+      '<p class="cs-gh-state" id="cs-gh-state"></p>' +
+      '<ol class="cs-gh-steps" id="cs-gh-steps"><li>按「建立 GitHub 金鑰」，名稱、期限和權限都已經填好。</li>' +
+        '<li>Repository access 選 <b>Only select repositories</b>，再選 <b>cccp003</b>。</li>' +
+        '<li>按最下面的 <b>Generate token</b>，複製 github_pat_ 開頭的金鑰，貼到下面按「儲存金鑰」。</li></ol>' +
+      '<div class="cs-gh-row" id="cs-gh-new"><a class="btn btn--sm" href="' + GH_NEW_TOKEN + '" target="_blank" rel="noopener noreferrer">建立 GitHub 金鑰 <span aria-hidden="true">↗</span></a></div>' +
+      '<div class="field" id="cs-gh-field"><label for="cs-gh-token">GitHub 金鑰 TOKEN</label><input id="cs-gh-token" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="github_pat_…"></div>' +
+      '<div class="cs-gh-row"><button class="btn btn--sm btn--solid" type="button" id="cs-gh-save">儲存金鑰</button><button class="btn btn--sm btn--ghost" type="button" id="cs-gh-forget" hidden>清除這台裝置的金鑰</button></div>' +
+      '<p class="hint">金鑰只存在這台裝置的瀏覽器，不會放進網站。它只能改 cccp003 這一個 repo；公用電腦上不要儲存。</p></section>' +
+    '<footer class="console-actions"><button class="btn btn--solid" type="button" id="cs-gh-publish" hidden>發布到 GitHub <em>PUBLISH</em></button><button class="btn btn--solid" type="button" id="cs-publish">發布到網站 <em>PUBLISH</em></button><button class="btn" type="button" id="cs-export">下載 index.html</button><p class="cs-status" id="cs-status" role="status" aria-live="polite"></p></footer>' +
   '</div></div>' +
   '<button class="dev-fab dev-ui" id="dev-fab" type="button" aria-pressed="false" hidden>' + PENCIL + '開發者模式 <em>DEV</em></button>' +
   '<div class="dev-bar dev-ui" id="dev-bar" role="toolbar" aria-label="開發者模式" hidden><span class="dev-tag">DEV</span><span class="dev-hint">點任何文字就能修改</span><span class="dev-count" id="dev-count" role="status" aria-live="polite">尚未修改</span>' +
@@ -1701,6 +1720,7 @@ function saveDraft() {
 }
 function markDirty(on, soon) {
   CS.dirty = on;
+  devCount();
   const fab = $('#console-fab'); if (fab) fab.classList.toggle('is-dirty', on);
   const p = $('#portrait'); if (p) p.classList.toggle('is-preview', on);
   if (CS.mode !== 'local') return;
@@ -1720,8 +1740,9 @@ function renderChRows() {
 function fillConsole() {
   $('#console-note').textContent = CS.mode === 'artifact'
     ? '只有你看得到這個面板。改好頭像或連結後按「發布到網站」，所有訪客都會看到新版本；要放到 GitHub Pages，就按「下載 index.html」。頁面上的文字可以開「開發者模式」直接點著改。'
-    : '本機編輯模式：修改只存在這台瀏覽器。按「下載 index.html」取得更新後的網站檔，替換 GitHub 上的同名檔案就會上線。頁面上的文字可以開「開發者模式」直接點著改（網址後面加 #dev 會直接開啟）。';
+    : '改完按「發布到 GitHub」，大約 1 分鐘後所有人都會看到新版本（第一次要先連接 GitHub）。頁面上的文字可以開「開發者模式」直接點著改，網址後面加 #dev 會直接開啟。';
   $('#cs-publish').hidden = CS.mode !== 'artifact';
+  if (CS.mode === 'local') ghRenderState();
   $('#cs-links').innerHTML = PROFILE.projects.map(p => '<div class="field"><label for="cs-link-' + p.id + '">' + p.ch + ' · ' + esc(p.title) + ' ' + esc(p.zh) + '</label><input id="cs-link-' + p.id + '" data-link-in="' + p.id + '" type="url" inputmode="url" placeholder="https://…" value="' + esc(CS.draft.links[p.id] || '') + '"></div>').join('');
   $('#cs-email').value = CS.draft.email;
   renderChRows(); csAvatarPreview(); renderTxList();
@@ -1860,11 +1881,12 @@ function enableConsole(mode) {
   $('#cs-publish').addEventListener('click', publishSite);
   $('#cs-export').addEventListener('click', exportHtml);
   bindDev(mode);
+  if (mode === 'local') bindGh();
   const saved = mode === 'local' ? store.get('yfy-draft') : sstore.get('yfy-pending');
   if (saved) {
     try {
       const d = normalize(JSON.parse(saved));
-      if (JSON.stringify(d) === JSON.stringify(DATA)) { if (mode === 'artifact') sstore.del('yfy-pending'); }
+      if (JSON.stringify(d) === JSON.stringify(BASE)) { if (mode === 'artifact') sstore.del('yfy-pending'); }
       else { CS.draft = d; touch(); if (mode === 'artifact') { sstore.del('yfy-pending'); toast('上次的修改還沒發布，已幫你留在站長面板。'); } }
     } catch (e) { /* ignore broken drafts */ }
   }
@@ -1967,8 +1989,10 @@ function txHit(x, y) {
 
 /* ---------- toolbar, hover outline, edited-text markers ---------- */
 function devCount() {
-  const n = txCount(), c = $('#dev-count');
-  if (c) c.textContent = n ? '已修改 ' + n + ' 處' : '尚未修改';
+  const c = $('#dev-count'); if (!c) return;
+  const n = pendingCount();
+  c.textContent = n ? n + ' 處未發布' : '沒有新修改';
+  c.classList.remove('busy', 'ok', 'err');
 }
 function devPaint() {
   if (!HL) return;
@@ -2101,13 +2125,13 @@ function devExit() {
   removeEventListener('scroll', devScroll);
   removeEventListener('resize', devScroll);
   if (HL) CSS.highlights.delete('tx-edited');
-  if (txCount() && CS.dirty) toast(CS.mode === 'artifact' ? '已離開開發者模式。記得按「發布」讓修改上線。' : '已離開開發者模式。修改存在這台瀏覽器，記得「下載 index.html」。');
+  if (pendingCount()) toast(CS.mode === 'artifact' ? '已離開開發者模式。記得按「發布」讓修改上線。' : '已離開開發者模式。還沒發布的修改存在這台瀏覽器，記得按「發布到 GitHub」。');
 }
 function devSave() {
   devClose();
   const v = validate(CS.draft || CUR);
   if (v.bad.length) { openConsole(); validate(CS.draft); csStatus('站長面板裡有欄位格式不對，請先修正標紅的欄位。', 'err'); return; }
-  if (CS.mode === 'artifact') publishSite(); else exportHtml();
+  if (CS.mode === 'artifact') publishSite(); else ghPublish();
 }
 // jump from the change list to that text and open its editor
 function devJump(k) {
@@ -2138,7 +2162,7 @@ function renderTxList() {
 function bindDev(mode) {
   const fab = $('#dev-fab'); fab.hidden = false;
   fab.addEventListener('click', () => { if (DEV.on) devExit(); else devEnter(); });
-  $('#dev-save').innerHTML = mode === 'artifact' ? '發布 <em>PUBLISH</em>' : '<span>下載<span class="dev-long"> index.html</span></span>';
+  $('#dev-save').innerHTML = mode === 'artifact' ? '發布 <em>PUBLISH</em>' : '<span>發布<span class="dev-long">到 GitHub</span></span>';
   $('#dev-save').addEventListener('click', devSave);
   $('#dev-exit').addEventListener('click', devExit);
   $('#dev-list').addEventListener('click', () => {
@@ -2175,6 +2199,222 @@ function bindDev(mode) {
     devMeta(); devGrow(); ta.focus();
   });
   addEventListener('pagehide', () => { if (draftTimer) saveDraft(); });
+}
+
+/* =====================================================================
+   Publish straight to GitHub (the GitHub Pages copy of this site).
+   The owner connects once with a fine-grained token that can only write
+   to this one repository; it is kept in this device's browser, never in
+   the page. Publishing rewrites only the data block of the live
+   index.html, merged with whatever is already there, so code changes and
+   edits made from another device are kept.
+   ===================================================================== */
+const GH = { owner: 'otis222', repo: 'cccp003', branch: 'main', path: 'index.html' };
+const GH_API = 'https://api.github.com/repos/' + GH.owner + '/' + GH.repo + '/contents/' + GH.path;
+const GH_NEW_TOKEN = 'https://github.com/settings/personal-access-tokens/new?name=YFY+Lab+site+publish&description=' +
+  encodeURIComponent('cccp003 網站「開發者模式」發布用') + '&target_name=' + GH.owner + '&expires_in=90&contents=write';
+const GH_TOKEN_KEY = 'yfy-gh-token', GH_PUB_KEY = 'yfy-gh-pub';
+let GH_BUSY = false, ghWatchId = 0;
+
+const ghToken = () => store.get(GH_TOKEN_KEY) || '';
+function toB64(str) {
+  const bytes = new TextEncoder().encode(str); let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+function fromB64(b64) {
+  const bin = atob(String(b64 || '').replace(/\s+/g, ''));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+async function ghReq(method, url, token, body) {
+  let r;
+  try {
+    const headers = { 'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer ' + token, 'X-GitHub-Api-Version': '2022-11-28' };
+    if (body) headers['Content-Type'] = 'application/json';
+    r = await fetch(url, { method, headers, cache: 'no-store', body: body ? JSON.stringify(body) : undefined });
+  } catch (e) { throw Object.assign(new Error('network'), { code: 'network' }); }
+  if (!r.ok) throw Object.assign(new Error('http ' + r.status), { code: r.status });
+  return r.json();
+}
+// the page's own data block, split out so only it gets replaced
+function splitData(html) {
+  const open = '<script type="application/json" id="yfy-data">';
+  const i = html.indexOf(open); if (i < 0) return null;
+  const j = html.indexOf('<\/script>', i + open.length); if (j < 0) return null;
+  return { pre: html.slice(0, i + open.length), json: html.slice(i + open.length, j), post: html.slice(j) };
+}
+// three-way merge: start from what is on GitHub now, apply only what changed on this device since it loaded
+function mergeData(base, mine, theirs) {
+  const out = theirs && typeof theirs === 'object' && !Array.isArray(theirs) ? clone(theirs) : {};
+  if (mine.avatar !== base.avatar) out.avatar = mine.avatar;
+  if (mine.email !== base.email) out.email = mine.email;
+  if (JSON.stringify(mine.channels) !== JSON.stringify(base.channels)) out.channels = clone(mine.channels);
+  const links = Object.assign({}, out.links && typeof out.links === 'object' ? out.links : {});
+  for (const id of Object.keys(mine.links)) if (mine.links[id] !== base.links[id]) links[id] = mine.links[id];
+  out.links = links;
+  const bt = base.texts || {}, mt = mine.texts || {};
+  const texts = Object.assign({}, out.texts && typeof out.texts === 'object' ? out.texts : {});
+  for (const k of new Set([...Object.keys(bt), ...Object.keys(mt)])) {
+    if (!hasOwn(mt, k)) delete texts[k];                                   // put back to the original wording here
+    else if (!hasOwn(bt, k) || bt[k] !== mt[k]) texts[k] = mt[k];          // added or changed here
+  }
+  out.texts = texts;
+  if (!out.v) out.v = 1;
+  return out;
+}
+// how many things differ from what is live
+function pendingCount() {
+  const b = BASE, c = CS.draft || CUR;
+  if (!b || !c) return 0;
+  const bt = b.texts || {}, ct = c.texts || {};
+  let n = 0;
+  for (const k of new Set([...Object.keys(bt), ...Object.keys(ct)])) if (bt[k] !== ct[k]) n++;
+  if (b.avatar !== c.avatar) n++;
+  if (b.email !== c.email) n++;
+  if (JSON.stringify(b.links) !== JSON.stringify(c.links)) n++;
+  if (JSON.stringify(b.channels) !== JSON.stringify(c.channels)) n++;
+  return n;
+}
+// short status on the developer toolbar, the full sentence in the console (or a toast when it is closed)
+function pubStatus(short, long, kind) {
+  const c = $('#dev-count');
+  if (c) { c.textContent = short; c.classList.remove('busy', 'ok', 'err'); if (kind) c.classList.add(kind); }
+  csStatus(long, kind === 'busy' ? '' : kind);
+}
+function ghButtons(busy) {
+  for (const id of ['dev-save', 'cs-gh-publish']) { const b = document.getElementById(id); if (b) b.disabled = busy; }
+}
+function ghRenderState() {
+  const st = $('#cs-gh-state'); if (!st) return;
+  const has = !!ghToken();
+  st.textContent = has ? '已連接 GitHub。改完按「發布到 GitHub」，約 1 分鐘後網站就會更新。'
+    : '還沒連接 GitHub。照下面三步做一次，之後在這台裝置改完就能直接發布。';
+  st.classList.toggle('on', has);
+  $('#cs-gh-steps').hidden = has; $('#cs-gh-new').hidden = has; $('#cs-gh-field').hidden = has;
+  $('#cs-gh-save').hidden = has; $('#cs-gh-forget').hidden = !has;
+}
+function ghAsk(msg) {
+  devClose(); openConsole();
+  setTimeout(() => {
+    const blk = $('#cs-gh-block'); if (blk) blk.scrollIntoView({ block: 'start' });
+    const inp = $('#cs-gh-token'); if (inp && !inp.closest('[hidden]')) inp.focus({ preventScroll: true });
+    csStatus(msg, 'err');
+  }, 60);
+}
+function ghForget(quiet) {
+  store.del(GH_TOKEN_KEY); ghRenderState();
+  if (!quiet) csStatus('已清除這台裝置上的 GitHub 金鑰。');
+}
+async function ghSaveToken() {
+  const inp = $('#cs-gh-token'), t = inp.value.replace(/\s+/g, '');
+  if (!/^(github_pat_|ghp_)[A-Za-z0-9_]{20,}$/.test(t)) { inp.setAttribute('aria-invalid', 'true'); csStatus('格式不對：請貼上 github_pat_ 開頭的那一整串金鑰。', 'err'); return; }
+  const btn = $('#cs-gh-save'); btn.disabled = true; csStatus('檢查金鑰中…');
+  try {
+    await ghReq('GET', GH_API + '?ref=' + GH.branch, t);
+    store.set(GH_TOKEN_KEY, t); inp.value = ''; inp.removeAttribute('aria-invalid');
+    ghRenderState();
+    csStatus(pendingCount() ? '已連接 GitHub。按下面的「發布到 GitHub」就會更新網站。' : '已連接 GitHub。之後改完按「發布到 GitHub」就會更新網站。', 'ok');
+  } catch (e) {
+    const c = e && e.code;
+    csStatus(c === 401 ? '這把金鑰無效或已過期，請重新建立一把。'
+      : c === 404 || c === 403 ? '這把金鑰看不到 cccp003：建立時 Repository access 要選 Only select repositories → cccp003。'
+      : c === 'network' ? '連不到 GitHub，請檢查網路後再試一次。' : '金鑰檢查沒有通過，請再試一次。', 'err');
+  } finally { btn.disabled = false; }
+}
+function ghFail(e) {
+  const c = e && e.code;
+  let msg = '發布沒有成功，請稍後再試一次。';
+  if (c === 401) { msg = 'GitHub 金鑰無效或已過期，請重新建立一把貼上（修改都還在）。'; ghForget(true); }
+  else if (c === 403) msg = '這把金鑰沒有寫入權限：建立時 Contents 要選 Read and write。';
+  else if (c === 404) msg = '這把金鑰看不到 cccp003：建立時 Repository access 要選到 cccp003。';
+  else if (c === 409 || c === 422) msg = 'GitHub 上的檔案剛好也在更新，請再按一次「發布」。';
+  else if (c === 'network') msg = '連不到 GitHub，請檢查網路後再試一次（修改都還在）。';
+  else if (c === 'format') msg = 'GitHub 上的 index.html 跟預期的格式不同，所以沒有發布。可以改用「下載 index.html」。';
+  pubStatus('發布失敗', msg, 'err');
+  if (c === 401 || c === 403 || c === 404) ghAsk(msg);
+}
+async function ghPublish() {
+  if (GH_BUSY) return;
+  devClose();
+  const v = validate(CS.draft || CUR);
+  if (v.bad.length) { openConsole(); validate(CS.draft || CUR); csStatus('站長面板裡有欄位格式不對，請先修正標紅的欄位。', 'err'); return; }
+  const token = ghToken();
+  if (!token) { ghAsk('先連接 GitHub：照下面三步建立金鑰，貼上後按「儲存金鑰」，再按「發布到 GitHub」。'); return; }
+  const n = pendingCount();
+  if (!n) { pubStatus('沒有新修改', '目前沒有需要發布的修改。'); return; }
+  GH_BUSY = true; ghButtons(true);
+  pubStatus('發布中…', '正在把修改送到 GitHub…', 'busy');
+  try {
+    let merged = null, same = false, sent = false;
+    for (let attempt = 0; attempt < 2 && !sent && !same; attempt++) {
+      const cur = await ghReq('GET', GH_API + '?ref=' + GH.branch, token);
+      if (!cur || !cur.content || !cur.sha) throw Object.assign(new Error('format'), { code: 'format' });
+      const html = fromB64(cur.content), parts = splitData(html);
+      if (!parts) throw Object.assign(new Error('format'), { code: 'format' });
+      let theirs;
+      try { theirs = JSON.parse(parts.json); } catch (e) { throw Object.assign(new Error('format'), { code: 'format' }); }
+      merged = mergeData(BASE, v.data, theirs);
+      const next = parts.pre + dataJson(merged) + parts.post;
+      if (next === html) { same = true; break; }
+      try {
+        await ghReq('PUT', GH_API, token, { message: '從開發者模式更新網站內容（' + n + ' 處）', content: toB64(next), sha: cur.sha, branch: GH.branch });
+        sent = true;
+      } catch (e) {
+        if ((e.code === 409 || e.code === 422) && attempt === 0) continue;   // the file changed in between: merge again on the newer copy
+        throw e;
+      }
+    }
+    const live = normalize(merged);
+    BASE = live; CS.draft = clone(live); CUR = CS.draft;
+    markDirty(false); renderDynamic(CUR);
+    store.set(GH_PUB_KEY, JSON.stringify({ data: merged, at: Date.now() }));
+    if (same) { pubStatus('已是最新', 'GitHub 上已經是這個版本了。', 'ok'); return; }
+    pubStatus('上線中…', '已送到 GitHub，網站大約 1 分鐘內會更新。', 'busy');
+    ghWatch(live);
+  } catch (e) {
+    ghFail(e);
+  } finally { GH_BUSY = false; ghButtons(false); }
+}
+// wait until GitHub Pages serves the new version, then say so
+async function ghWatch(live) {
+  const id = ++ghWatchId, want = JSON.stringify(live);
+  for (let i = 0; i < 40; i++) {
+    await new Promise(r => setTimeout(r, i < 6 ? 5000 : 8000));
+    if (id !== ghWatchId) return;
+    try {
+      const html = await (await fetch(location.pathname + '?gh=' + Date.now(), { cache: 'no-store' })).text();
+      const p = splitData(html);
+      if (p && JSON.stringify(normalize(JSON.parse(p.json))) === want) {
+        if (!pendingCount()) pubStatus('已上線 ✓', '網站已更新，大家現在看到的就是新版本。', 'ok');
+        else toast('網站已更新到你剛發布的版本。');
+        return;
+      }
+    } catch (e) { /* keep waiting */ }
+  }
+  if (id === ghWatchId && !pendingCount()) pubStatus('部署中', 'GitHub 還在部署，晚一點重新整理就會看到新版本。');
+}
+// right after publishing, this device may still be served the previous copy for a few minutes: show the new one here
+function pubOverlay() {
+  if (window.claude && typeof window.claude.use === 'function') return;
+  let pub = null;
+  try { pub = JSON.parse(store.get(GH_PUB_KEY) || 'null'); } catch (e) { pub = null; }
+  if (!pub || !pub.data || !pub.at) return;
+  const d = normalize(pub.data);
+  if (Date.now() - pub.at > 12 * 60e3 || JSON.stringify(d) === JSON.stringify(DATA)) { store.del(GH_PUB_KEY); return; }
+  BASE = d; CUR = d;
+  setTimeout(() => toast('剛發布的修改正在上線，這台裝置先顯示新版本。'), 900);
+}
+function bindGh() {
+  $('#cs-gh-block').hidden = false;
+  $('#cs-gh-publish').hidden = false;
+  $('#cs-gh-publish').addEventListener('click', ghPublish);
+  $('#cs-gh-save').addEventListener('click', ghSaveToken);
+  $('#cs-gh-token').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); ghSaveToken(); } });
+  $('#cs-gh-token').addEventListener('input', e => e.target.removeAttribute('aria-invalid'));
+  $('#cs-gh-forget').addEventListener('click', () => ghForget(false));
+  ghRenderState();
 }
 
 /* =====================================================================
@@ -2247,6 +2487,7 @@ function start() {
   const pal = store.get('yfy-palette');
   ROOT.setAttribute('data-palette', pal === 'cyano' ? 'cyano' : 'paper');
   PALETTE = ROOT.getAttribute('data-palette');
+  pubOverlay();
   renderApp();
   applyTexts();
   for (const b of $$('button[data-pal]')) b.setAttribute('aria-pressed', String(b.getAttribute('data-pal') === PALETTE));
