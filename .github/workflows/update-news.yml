@@ -1,0 +1,141 @@
+name: 更新最新消息
+
+on:
+  schedule:
+    # GitHub 的排程用 UTC：00:00 UTC = 台灣時間早上 8:00
+    - cron: '0 0 * * *'
+  workflow_dispatch: {}   # 在 Actions 分頁按「Run workflow」就能手動執行
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-news
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 抓 Google 快訊 RSS，存成 news.json
+        env:
+          FEEDS: |
+            https://www.google.com/alerts/feeds/00846238355750175288/6074583596596294981
+            https://www.google.com/alerts/feeds/00846238355750175288/14739364040078037495
+          MAX_ITEMS: '30'
+        run: |
+          python3 - <<'PY'
+          import html, json, os, re, sys, urllib.request
+          from datetime import datetime, timezone
+          from urllib.parse import urlparse, parse_qs
+          import xml.etree.ElementTree as ET
+
+          NS = {'a': 'http://www.w3.org/2005/Atom'}
+          FEEDS = [u.strip() for u in os.environ['FEEDS'].splitlines() if u.strip()]
+          MAX_ITEMS = int(os.environ.get('MAX_ITEMS', '30'))
+          OUT = 'news.json'
+
+          def clean(s):
+              """去掉 <b> 之類的標籤和 HTML 字元碼，壓成一行純文字。"""
+              s = html.unescape(s or '')
+              s = re.sub(r'<[^>]+>', '', s)
+              s = html.unescape(s)
+              return re.sub(r'\s+', ' ', s).strip()
+
+          def real_url(link):
+              """Google 快訊的連結是 google.com/url?url=…，取出真正的新聞網址。"""
+              try:
+                  p = urlparse(link)
+                  if p.netloc.endswith('google.com') and p.path == '/url':
+                      u = parse_qs(p.query).get('url', [''])[0]
+                      if u:
+                          return u
+              except Exception:
+                  pass
+              return link
+
+          def fetch(url):
+              req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (compatible; yfy-news-bot)'})
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  return r.read()
+
+          items, ok = [], 0
+          for feed in FEEDS:
+              try:
+                  root = ET.fromstring(fetch(feed))
+              except Exception as e:
+                  print(f'::warning::抓不到 {feed}：{e}')
+                  continue
+              ok += 1
+              ftitle = clean(root.findtext('a:title', '', NS))
+              # 「Google Alert - 鳴潮」/「Google 快訊 - 鳴潮」→「鳴潮」
+              topic = ftitle.split(' - ', 1)[1].strip() if ' - ' in ftitle else ftitle
+              for e in root.findall('a:entry', NS):
+                  link_el = e.find('a:link', NS)
+                  url = real_url(link_el.get('href', '') if link_el is not None else '')
+                  if not url.startswith(('http://', 'https://')):
+                      continue
+                  title = clean(e.findtext('a:title', '', NS))
+                  if not title:
+                      continue
+                  host = urlparse(url).netloc.lower()
+                  items.append({
+                      'title': title,
+                      'url': url,
+                      'source': host[4:] if host.startswith('www.') else host,
+                      'topic': topic,
+                      'summary': clean(e.findtext('a:content', '', NS))[:200],
+                      'published': e.findtext('a:published', '', NS) or e.findtext('a:updated', '', NS),
+                  })
+              print(f'{topic}：{len(root.findall("a:entry", NS))} 則')
+
+          if ok == 0:
+              sys.exit('::error::所有 RSS 都抓取失敗，保留原本的 news.json')
+
+          # 跟舊的 news.json 合併，RSS 暫時變少時區塊也不會空掉
+          old = {}
+          if os.path.exists(OUT):
+              try:
+                  with open(OUT, encoding='utf-8') as f:
+                      old = json.load(f)
+              except Exception:
+                  old = {}
+          merged, seen = [], set()
+          for it in sorted(items + old.get('items', []), key=lambda x: x.get('published', ''), reverse=True):
+              key = it.get('url')
+              tkey = re.sub(r'\W+', '', it.get('title', '')).lower()
+              if not key or key in seen or tkey in seen:
+                  continue
+              seen.add(key); seen.add(tkey)
+              merged.append(it)
+          merged = merged[:MAX_ITEMS]
+
+          if merged == old.get('items'):
+              print('沒有新消息，不更新 news.json')
+              sys.exit(0)
+
+          data = {
+              'updated': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+              'items': merged,
+          }
+          with open(OUT, 'w', encoding='utf-8') as f:
+              json.dump(data, f, ensure_ascii=False, indent=2)
+              f.write('\n')
+          print(f'已寫入 {len(merged)} 則消息')
+          PY
+
+      - name: 有變動就 commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add news.json
+          if git diff --cached --quiet; then
+            echo '沒有變動'
+            exit 0
+          fi
+          git commit -m '更新最新消息 news.json'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
