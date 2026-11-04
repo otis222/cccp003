@@ -1,0 +1,29 @@
+name: 更新最新消息
+
+on:
+  schedule:
+    # GitHub 的排程用 UTC：00:00 UTC = 台灣時間早上 8:00
+    - cron: '0 0 * * *'
+  workflow_dispatch: {}   # 在 Actions 分頁按「Run workflow」就能手動執行
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-news
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 抓 Google 快訊 RSS，存成 news.json
+        env:
+          FEEDS: |
+            https://www.google.com/alerts/feeds/00846238355750175288/6074583596596294981
+            https://www.google.com/alerts/feeds/00846238355750175288/14739364040078037495
+          MAX_ITEMS: '30'
+        run: |
