@@ -3,15 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>葉俸瑜 YFY Lab</title>
-<meta name="description" content="葉俸瑜的個人作品集。獨立遊戲開發者，大同大學數位媒體設計學系。">
+<title>葉俸瑜 YFY Lab｜獨立遊戲與互動網頁作品集</title>
+<meta name="description" content="葉俸瑜，大同大學數位媒體設計學系學生，製作獨立遊戲與互動網頁。">
+<link rel="canonical" href="https://otis222.github.io/cccp003/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="葉俸瑜 YFY Lab">
-<meta property="og:description" content="葉俸瑜的個人作品集。獨立遊戲開發者，大同大學數位媒體設計學系。">
+<meta property="og:site_name" content="YFY Lab">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:title" content="葉俸瑜 YFY Lab｜獨立遊戲與互動網頁作品集">
+<meta property="og:description" content="葉俸瑜，大同大學數位媒體設計學系學生，製作獨立遊戲與互動網頁。">
 <meta property="og:url" content="https://otis222.github.io/cccp003/">
+<meta property="og:image" content="https://otis222.github.io/cccp003/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="葉俸瑜 YFY Lab 個人作品集，右側為貪食蛇遊戲畫面">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#EEE5D0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#17120F" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=&#39;http://www.w3.org/2000/svg&#39; viewBox=&#39;0 0 40 40&#39;%3E%3Crect width=&#39;40&#39; height=&#39;40&#39; rx=&#39;9&#39; fill=&#39;%23EEE5D0&#39;/%3E%3Cpolygon points=&#39;20,5 33,12.5 33,27.5 20,35 7,27.5 7,12.5&#39; fill=&#39;none&#39; stroke=&#39;%23211A16&#39; stroke-width=&#39;2.6&#39; stroke-linejoin=&#39;round&#39;/%3E%3Cpath d=&#39;M20 5L13.5 24H26.5Z M13.5 24L20 35L26.5 24&#39; fill=&#39;none&#39; stroke=&#39;%23211A16&#39; stroke-width=&#39;1.6&#39; stroke-linejoin=&#39;round&#39;/%3E%3Ccircle cx=&#39;20&#39; cy=&#39;18&#39; r=&#39;3.6&#39; fill=&#39;%23E0522A&#39;/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="1024x1024" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-EKFD1PNSN7"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
@@ -311,6 +321,8 @@ html.gl-on .fx-planet{display:none}
 .aff b{font-size:17px;line-height:1.35}
 .aff span{font:400 11px/1.4 var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
 .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.share-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.share-actions .btn{min-height:44px}
 .hero-foot{position:absolute;left:0;right:0;bottom:30px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;color:var(--ink-2);font-size:13px}
 .hero-foot .cap{padding:4px 9px 3px;border-radius:3px;background:var(--hud);max-width:62em}
 .hero-foot .fig{font:700 11px/1 var(--f-display);letter-spacing:.16em;color:var(--ink);padding:5px 8px 4px;border:1.5px solid var(--ink);border-radius:3px}
@@ -752,7 +764,6 @@ const PROFILE = {
   unitEn: 'Tatung Univ. · Digital Media Design · 2024–2028',
   base: '台灣 Taiwan · UTC+8',
   term: { start: '2024-09-01T00:00:00+08:00', end: '2028-07-31T23:59:59+08:00', startLabel: '2024.09', endLabel: '2028.07', firstYear: 2024 },
-  lead: '獨立遊戲開發者。',
   motto: '帶來物理現實世界的改變，是最有價值的。',
   bio: [
     '葉俸瑜，大同大學數位媒體設計學系學生，2024 年入學，預計 2028 年 7 月畢業。性格樂觀負責、學習力強，在「遊戲設計(二)」課程拿到全班第一名。'
@@ -813,7 +824,7 @@ const sstore = {
 };
 
 /* ---------- the published site (GitHub Pages) — build.py reads this same line ---------- */
-const SITE = {"title":"葉俸瑜 YFY Lab","url":"https://otis222.github.io/cccp003/","description":"葉俸瑜的個人作品集。獨立遊戲開發者，大同大學數位媒體設計學系。","ga":"G-EKFD1PNSN7","fonts":"https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap","icon":"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%23EEE5D0'/%3E%3Cpolygon points='20,5 33,12.5 33,27.5 20,35 7,27.5 7,12.5' fill='none' stroke='%23211A16' stroke-width='2.6' stroke-linejoin='round'/%3E%3Cpath d='M20 5L13.5 24H26.5Z M13.5 24L20 35L26.5 24' fill='none' stroke='%23211A16' stroke-width='1.6' stroke-linejoin='round'/%3E%3Ccircle cx='20' cy='18' r='3.6' fill='%23E0522A'/%3E%3C/svg%3E"}; // SITE-META
+const SITE = {"title":"葉俸瑜 YFY Lab｜獨立遊戲與互動網頁作品集","url":"https://otis222.github.io/cccp003/","description":"葉俸瑜，大同大學數位媒體設計學系學生，製作獨立遊戲與互動網頁。","ga":"G-EKFD1PNSN7","fonts":"https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap","icon":"https://otis222.github.io/cccp003/favicon.png","image":"https://otis222.github.io/cccp003/og.jpg","imageAlt":"葉俸瑜 YFY Lab 個人作品集，右側為貪食蛇遊戲畫面"}; // SITE-META
 
 /* ---------- owner-editable data (lives in #yfy-data) ---------- */
 const DEFAULT_DATA = {
@@ -1042,9 +1053,14 @@ function renderApp() {
     '<section class="hero" id="top" aria-labelledby="hero-name">' +
       '<div class="hero-copy" data-depth="0.35">' +
         '<h1 class="hero-name" id="hero-name"><span class="zh">' + esc(P.name) + '</span><span class="en">' + esc(P.nameEn) + stripe() + '</span></h1>' +
-        '<p class="hero-lead">' + esc(P.lead) + '</p>' +
+        '<p class="hero-lead">' + esc(SITE.description) + '</p>' +
         '<p class="aff"><b>' + esc(P.unit) + '</b><span>' + esc(P.unitEn) + '</span></p>' +
         '<div class="cta"><a class="btn btn--solid" href="#projects">看項目 <em>PROJECTS</em><span class="arr" aria-hidden="true">↘</span></a><a class="btn" href="#contact">聯絡我 <em>CONTACT</em></a></div>' +
+        '<div class="share-actions" role="group" aria-label="分享網站" data-tx-off>' +
+          '<a class="btn btn--sm" aria-label="分享到 LINE" target="_blank" rel="noopener noreferrer" href="https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(SITE.url) + '">LINE</a>' +
+          '<a class="btn btn--sm" aria-label="分享到 Facebook" target="_blank" rel="noopener noreferrer" href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(SITE.url) + '">Facebook</a>' +
+          '<button class="btn btn--sm" type="button" id="share-site">複製網址</button>' +
+        '</div>' +
       '</div>' +
       '<div class="pass-wrap" data-depth="0.7">' +
         '<aside class="pass" aria-label="研究員證">' +
@@ -1716,13 +1732,24 @@ function standaloneDocument(data) {
     '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n' +
     '<title>' + esc(S.title) + '</title>\n' +
     '<meta name="description" content="' + esc(S.description) + '">\n' +
+    '<link rel="canonical" href="' + esc(S.url) + '">\n' +
     '<meta property="og:type" content="website">\n' +
+    '<meta property="og:site_name" content="YFY Lab">\n' +
+    '<meta property="og:locale" content="zh_TW">\n' +
     '<meta property="og:title" content="' + esc(S.title) + '">\n' +
     '<meta property="og:description" content="' + esc(S.description) + '">\n' +
     '<meta property="og:url" content="' + esc(S.url) + '">\n' +
+    '<meta property="og:image" content="' + esc(S.image) + '">\n' +
+    '<meta property="og:image:type" content="image/jpeg">\n' +
+    '<meta property="og:image:width" content="1200">\n' +
+    '<meta property="og:image:height" content="630">\n' +
+    '<meta property="og:image:alt" content="' + esc(S.imageAlt) + '">\n' +
+    '<meta name="twitter:card" content="summary_large_image">\n' +
+    $$('meta[name="google-site-verification"]', document.head).map(tag => tag.outerHTML + '\n').join('') +
     '<meta name="theme-color" content="#EEE5D0" media="(prefers-color-scheme: light)">\n' +
     '<meta name="theme-color" content="#17120F" media="(prefers-color-scheme: dark)">\n' +
-    '<link rel="icon" href="' + esc(S.icon) + '">\n' +
+    '<link rel="icon" type="image/png" sizes="1024x1024" href="' + esc(S.icon) + '">\n' +
+    '<link rel="apple-touch-icon" href="' + esc(S.icon) + '">\n' +
     '<script async src="https://www.googletagmanager.com/gtag/js?id=' + esc(S.ga) + '"><\/script>\n' +
     '<script>\nwindow.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag(\'js\', new Date());\ngtag(\'config\', \'' + S.ga + '\');\n<\/script>\n' +
     '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
@@ -2523,6 +2550,25 @@ function bindUI() {
   menu.addEventListener('click', e => { if (e.target.closest('a')) setMenu(false); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden) { setMenu(false); mb.focus(); } });
   for (const b of $$('.station')) b.addEventListener('click', () => { const el = document.getElementById(b.getAttribute('data-go')); if (el) el.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth' }); });
+  const shareButton = $('#share-site');
+  const canShare = matchMedia('(pointer: coarse)').matches && typeof navigator.share === 'function';
+  if (canShare) shareButton.textContent = '手機分享';
+  shareButton.addEventListener('click', async () => {
+    if (canShare) {
+      try {
+        await navigator.share({ title: SITE.title, url: SITE.url });
+        return;
+      } catch (error) {
+        if (error.name === 'AbortError') return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(SITE.url);
+      toast('已複製網站網址');
+    } catch {
+      window.prompt('複製網站網址', SITE.url);
+    }
+  });
   $('#copy-mail').addEventListener('click', async () => {
     const addr = CUR.email;
     try { await navigator.clipboard.writeText(addr); toast('已複製信箱：' + addr); }
