@@ -323,6 +323,37 @@ html.gl-on .fx-planet{display:none}
 .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
 .share-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
 .share-actions .btn{min-height:44px}
+/* today's weather card (Open-Meteo) → weather.html */
+.wx-card{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:4px 14px;max-width:470px;margin-top:22px;padding:12px 14px 12px 12px;border:1.5px solid var(--ink);border-radius:14px;background:var(--paper-2);color:var(--ink);text-decoration:none;box-shadow:6px 7px 0 -2px var(--rule-2);transition:transform .2s ease,box-shadow .2s ease}
+.wx-card:hover{transform:translate(-2px,-2px);box-shadow:9px 10px 0 -2px var(--rule)}
+.wx-card:hover .wx-go{color:var(--acc-tx)}
+.wx-card:hover .wx-go .arr{transform:translateX(3px)}
+.wx-ic{display:grid;place-items:center;width:58px;height:58px;flex:none;border:1.5px solid var(--ink);border-radius:50%;background:var(--paper);box-shadow:inset 0 0 0 4px var(--paper),inset 0 0 0 5px var(--rule)}
+.wx-ic .wi{display:block;width:40px;height:40px;overflow:visible}
+.wx-main{display:grid;gap:4px;min-width:0}
+.wx-k{font:400 10.5px/1.2 var(--f-display);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.wx-t{display:flex;align-items:baseline;gap:10px;min-width:0}
+.wx-t b{font:700 30px/1 var(--f-display);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.wx-t span{font:700 16px/1.3 var(--f-cjk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wx-r{display:flex;flex-wrap:wrap;align-items:center;gap:2px 12px;font-size:12.5px;line-height:1.5;color:var(--ink-2)}
+.wx-r b{font-weight:700;color:var(--ink)}
+.wx-rain{display:inline-flex;align-items:center;gap:6px}
+.wx-rain::before{content:"";width:7px;height:7px;flex:none;border-radius:50%;background:var(--tens)}
+.wx-card[data-rain="maybe"] .wx-rain::before{background:var(--warn)}
+.wx-card[data-rain="yes"] .wx-rain::before{background:var(--accent)}
+.wx-go{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;align-self:stretch;padding-left:14px;border-left:1px dashed var(--rule);font:700 12px/1.25 var(--f-cjk);letter-spacing:.04em;text-align:center;white-space:nowrap;transition:color .2s ease}
+.wx-go .arr{font:700 18px/1 var(--f-display);transition:transform .25s ease}
+.wx-card.is-loading .wx-t,.wx-card.is-loading .wx-r{opacity:.55}
+.wx-card .wi-ray{stroke:var(--ink);stroke-width:2;stroke-linecap:round}
+.wx-card .wi-sun{fill:var(--accent);stroke:var(--ink);stroke-width:1.8}
+.wx-card .wi-moon{fill:var(--paper-3);stroke:var(--ink);stroke-width:1.8;stroke-linejoin:round}
+.wx-card .wi-cloud{fill:var(--paper-2);stroke:var(--ink);stroke-width:1.9;stroke-linejoin:round}
+.wx-card .wi-rain{stroke:var(--tens);stroke-width:2.2;stroke-linecap:round}
+.wx-card .wi-drop{fill:var(--tens)}
+.wx-card .wi-snow{stroke:var(--tens);stroke-width:1.6;stroke-linecap:round}
+.wx-card .wi-bolt{fill:var(--warn);stroke:var(--ink);stroke-width:1.5;stroke-linejoin:round}
+.wx-card .wi-fog{stroke:var(--ink-2);stroke-width:2.2;stroke-linecap:round}
+@media (max-width:400px){.wx-card{gap:4px 12px;padding-right:12px}.wx-ic{width:50px;height:50px}.wx-ic .wi{width:34px;height:34px}.wx-go{padding-left:10px}.wx-go > span:first-child{display:none}}
 .hero-foot{position:absolute;left:0;right:0;bottom:30px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;color:var(--ink-2);font-size:13px}
 .hero-foot .cap{padding:4px 9px 3px;border-radius:3px;background:var(--hud);max-width:62em}
 .hero-foot .fig{font:700 11px/1 var(--f-display);letter-spacing:.16em;color:var(--ink);padding:5px 8px 4px;border:1.5px solid var(--ink);border-radius:3px}
@@ -1061,6 +1092,14 @@ function renderApp() {
           '<a class="btn btn--sm" aria-label="分享到 Facebook" target="_blank" rel="noopener noreferrer" href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(SITE.url) + '">Facebook</a>' +
           '<button class="btn btn--sm" type="button" id="share-site">複製網址</button>' +
         '</div>' +
+        /* today's weather — filled by loadWeather(); the whole card opens weather.html */
+        '<a class="wx-card is-loading" id="wx-card" href="weather.html" data-tx-off aria-label="今天台北的天氣，點開看完整天氣預報">' +
+          '<span class="wx-ic" id="wx-ic" aria-hidden="true">' + wxIcon('cloudy', true) + '</span>' +
+          '<span class="wx-main"><span class="wx-k">Taipei · 今天天氣</span>' +
+            '<span class="wx-t"><b id="wx-temp">--°</b><span id="wx-cond">讀取中…</span></span>' +
+            '<span class="wx-r" id="wx-r"><span class="wx-rain"><span>降雨機率 --%</span></span></span></span>' +
+          '<span class="wx-go"><span>7 天預報</span><span class="arr" aria-hidden="true">→</span></span>' +
+        '</a>' +
       '</div>' +
       '<div class="pass-wrap" data-depth="0.7">' +
         '<aside class="pass" aria-label="研究員證">' +
@@ -2536,6 +2575,112 @@ async function loadNews() {
   readScroll(); placeStations();
 }
 
+/* =====================================================================
+   今天天氣小卡 — Open-Meteo（免金鑰、可直接從前端抓），完整預報在 weather.html
+   ===================================================================== */
+const WX_AT = { lat: 25.0478, lon: 121.517 };   // 台北市 — same spot as weather.html's default
+function wxKind(code) {   // WMO weather code → 中文 + icon (same table as weather.html)
+  const c = Number(code);
+  if (c === 0) return ['晴', 'clear'];
+  if (c === 1) return ['大致晴朗', 'mostly'];
+  if (c === 2) return ['多雲', 'mostly'];
+  if (c === 3) return ['陰天', 'cloudy'];
+  if (c === 45 || c === 48) return ['霧', 'fog'];
+  if (c >= 51 && c <= 55) return ['毛毛雨', 'drizzle'];
+  if (c === 56 || c === 57) return ['凍毛毛雨', 'drizzle'];
+  if (c === 61) return ['小雨', 'rain'];
+  if (c === 63) return ['中雨', 'rain'];
+  if (c === 65) return ['大雨', 'rain'];
+  if (c === 66 || c === 67) return ['凍雨', 'rain'];
+  if (c === 71) return ['小雪', 'snow'];
+  if (c === 73) return ['中雪', 'snow'];
+  if (c === 75) return ['大雪', 'snow'];
+  if (c === 77) return ['雪粒', 'snow'];
+  if (c === 80) return ['短暫陣雨', 'showers'];
+  if (c === 81) return ['陣雨', 'showers'];
+  if (c === 82) return ['強陣雨', 'showers'];
+  if (c === 85 || c === 86) return ['陣雪', 'snow'];
+  if (c === 95) return ['雷雨', 'thunder'];
+  if (c === 96 || c === 99) return ['雷雨伴隨冰雹', 'thunder'];
+  return ['—', 'cloudy'];
+}
+const wxIcon = (() => {   // 48 × 48 line drawings, same shapes as weather.html
+  const f = n => n.toFixed(1);
+  const sun = (cx, cy, r, r1, r2) => {
+    let d = '';
+    for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4, c = Math.cos(a), s = Math.sin(a); d += 'M' + f(cx + c * r1) + ' ' + f(cy + s * r1) + 'L' + f(cx + c * r2) + ' ' + f(cy + s * r2); }
+    return '<path class="wi-ray" d="' + d + '"/><circle class="wi-sun" cx="' + cx + '" cy="' + cy + '" r="' + r + '"/>';
+  };
+  const moon = (cx, cy, r) => {
+    const a1 = -64 * Math.PI / 180, a2 = 26 * Math.PI / 180;
+    const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1), x2 = cx + r * Math.cos(a2), y2 = cy + r * Math.sin(a2);
+    return '<path class="wi-moon" d="M' + f(x1) + ' ' + f(y1) + 'A' + r + ' ' + r + ' 0 1 0 ' + f(x2) + ' ' + f(y2) + 'A' + f(r * .78) + ' ' + f(r * .78) + ' 0 0 1 ' + f(x1) + ' ' + f(y1) + 'Z"/>';
+  };
+  const cloud = (x0, x1, y, h) => {
+    const rr = h * .36, rl = h * .3, rx = x1 - rr, ry = y - 2 * rr, lx = x0 + rl, ly = y - 2 * rl;
+    const rt = Math.hypot(rx - lx, ry - ly) / 2 * 1.04;
+    return '<path class="wi-cloud" d="M' + f(lx) + ' ' + f(y) + 'H' + f(rx) + 'A' + f(rr) + ' ' + f(rr) + ' 0 0 0 ' + f(rx) + ' ' + f(ry) +
+      'A' + f(rt) + ' ' + f(rt) + ' 0 0 0 ' + f(lx) + ' ' + f(ly) + 'A' + f(rl) + ' ' + f(rl) + ' 0 0 0 ' + f(lx) + ' ' + f(y) + 'Z"/>';
+  };
+  const rain = (xs, y0, len) => '<path class="wi-rain" d="' + xs.map(x => 'M' + x + ' ' + y0 + 'l-2.6 ' + len).join('') + '"/>';
+  const drops = pts => pts.map(p => '<circle class="wi-drop" cx="' + p[0] + '" cy="' + p[1] + '" r="1.7"/>').join('');
+  const flakes = pts => '<path class="wi-snow" d="' + pts.map(p => 'M' + (p[0] - 2.6) + ' ' + p[1] + 'h5.2M' + (p[0] - 1.3) + ' ' + (p[1] - 2.25) + 'l2.6 4.5M' + (p[0] + 1.3) + ' ' + (p[1] - 2.25) + 'l-2.6 4.5').join('') + '"/>';
+  const KINDS = {
+    clear: day => day ? sun(24, 24, 8.5, 13, 18.5) : moon(24, 24, 13),
+    mostly: day => (day ? sun(17, 17, 6.2, 9.6, 13.4) : moon(18, 17, 8.6)) + cloud(15, 43, 38, 17),
+    cloudy: () => cloud(7, 41, 36, 22),
+    fog: () => cloud(10, 38, 26, 16) + '<path class="wi-fog" d="M9 31H39M13 37H35M9 43H31"/>',
+    drizzle: () => cloud(8, 40, 29, 20) + drops([[17, 35], [25, 38], [33, 35], [21, 44], [29, 44]]),
+    rain: () => cloud(8, 40, 29, 20) + rain([18, 25, 32], 34, 9),
+    showers: day => (day ? sun(15, 13, 5.4, 8.4, 11.6) : moon(15, 13, 7.4)) + cloud(13, 43, 31, 18) + rain([21, 28, 35], 36, 8),
+    snow: () => cloud(8, 40, 29, 20) + flakes([[17, 37], [25, 43], [33, 37]]),
+    thunder: () => cloud(8, 40, 29, 20) + '<path class="wi-bolt" d="M26 31L19.5 40.5H24.5L22 47L31 36.5H26L29 31Z"/>'
+  };
+  return (kind, day) => '<svg class="wi" viewBox="0 0 48 48" aria-hidden="true" focusable="false">' + (KINDS[kind] || KINDS.cloudy)(day !== false) + '</svg>';
+})();
+async function loadWeather() {
+  const card = $('#wx-card'); if (!card) return;
+  const num = v => typeof v === 'number' && isFinite(v);
+  const dg = v => num(v) ? Math.round(v) + '°' : '--°';
+  try {
+    const q = new URLSearchParams({
+      latitude: WX_AT.lat, longitude: WX_AT.lon,
+      current: 'temperature_2m,precipitation,weather_code,is_day',
+      daily: 'temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum',
+      timezone: 'Asia/Taipei', forecast_days: '1'
+    });
+    const ctl = typeof AbortController === 'function' ? new AbortController() : null;
+    const timer = ctl ? setTimeout(() => ctl.abort(), 12000) : 0;
+    let j;
+    try {
+      const r = await fetch('https://api.open-meteo.com/v1/forecast?' + q, ctl ? { signal: ctl.signal } : undefined);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      j = await r.json();
+    } finally { clearTimeout(timer); }
+    const c = j.current, d = j.daily;
+    const kind = wxKind(c.weather_code);
+    const pop = num(d.precipitation_probability_max[0]) ? d.precipitation_probability_max[0] : null;
+    const mm = num(d.precipitation_sum[0]) ? d.precipitation_sum[0] : 0;
+    // same umbrella rule as weather.html: raining now, or ≥ 40 % / > 1 mm today
+    const wet = num(c.precipitation) && c.precipitation > 0 && ['drizzle', 'rain', 'showers', 'thunder'].includes(kind[1]);
+    const rain = wet || (pop !== null && pop >= 40) || mm > 1 ? 'yes' : pop !== null && pop >= 20 ? 'maybe' : 'no';
+    const word = rain === 'yes' ? (wet ? '正在下雨，記得帶傘' : '會下雨，記得帶傘') : rain === 'maybe' ? '可能會下雨' : '不太會下雨';
+    const t = num(c.temperature_2m) ? Math.round(c.temperature_2m) : null;
+    $('#wx-ic').innerHTML = wxIcon(kind[1], c.is_day !== 0);
+    setText('wx-temp', t === null ? '--°' : t + '°');
+    setText('wx-cond', kind[0]);
+    $('#wx-r').innerHTML = '<span class="wx-rain"><span>降雨機率 <b>' + (pop === null ? '--' : pop) + '%</b>・' + word + '</span></span>' +
+      '<span>最高 <b>' + dg(d.temperature_2m_max[0]) + '</b>　最低 <b>' + dg(d.temperature_2m_min[0]) + '</b></span>';
+    card.setAttribute('data-rain', rain);
+    card.setAttribute('aria-label', '今天台北' + (t === null ? '' : ' ' + t + '°C') + '，' + kind[0] + '，降雨機率 ' + (pop === null ? '未知' : pop + '%') + '，' + word + '。點開看完整天氣預報');
+  } catch (e) {
+    setText('wx-cond', '天氣暫時讀不到');
+    const r = $('#wx-r'); if (r) r.innerHTML = '<span>點這裡打開完整預報頁</span>';
+    card.setAttribute('aria-label', '今天的天氣暫時讀不到，點開看完整天氣預報');
+  }
+  card.classList.remove('is-loading');
+}
+
 function setCurrent(id) {
   for (const a of $$('.nav a[data-nav]')) a.setAttribute('aria-current', String(a.getAttribute('data-nav') === id));
   for (const b of $$('.station')) b.setAttribute('aria-current', String(b.getAttribute('data-go') === id));
@@ -2629,6 +2774,7 @@ function start() {
   PAR = $$('[data-depth]').map(el => { el._d = parseFloat(el.getAttribute('data-depth')) || 0; return el; });
   bindUI(); readScroll(); placeStations();
   loadNews();
+  loadWeather();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { lamp('lamp-font', 'on'); placeStations(); });
   setTimeout(placeStations, 1200);
   if (REDUCED) settle(); else requestAnimationFrame(loop);
