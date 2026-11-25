@@ -32,6 +32,9 @@
 - `index.html`：目前的個人網站，單一 HTML 檔（3D 場景使用 three.js r128）。
 - `v1.html`：上一版個人網站，保留作為作品紀錄。
 - `weather.html`：天氣預報頁（第 11 週：API 介接資料）。用 Open-Meteo 免金鑰 API 顯示現在、今天與未來 7 天天氣，預設台北，可「使用我的位置」或切換城市，並依天氣給帶傘、穿搭、跑步、夜遊建議；判斷門檻寫在檔案裡的 `RULES`。首頁的「今天天氣」小卡也是抓同一個 API，點了會打開這一頁。
+- `image.html`：圖片批次壓縮轉檔器（第 12 週：生活工具 1）。拖曳多張圖片，在瀏覽器裡轉成 WebP／PNG／JPG、調品質、等比縮放，多張打包 ZIP；完全不上傳。Safari 不能用 canvas 輸出 WebP，會自動改用 `vendor/webp/` 裡的 WebAssembly 編碼器（@jsquash/webp，Apache-2.0）。
+- `color.html`：UI 配色與對比度測試器（第 12 週：生活工具 2）。輸入主色，用 OKLCH 產生 50–950 色階、中性灰、輔助色、語意色，依 WCAG 2.2 計算對比度；點色塊複製 HEX／CSS 變數／RGB，可匯出 CSS、Tailwind、JSON，網址 `#c=E0522A` 可以分享整組配色。
+- `assets/`：兩個工具各自的 favicon（SVG、32×32、180×180）和 1200×630 分享卡圖片。
 - `game.html`：貪食蛇小遊戲。方向鍵／WASD 往該方向走（手機用十字鍵或在畫面上滑動），按住 Shift 加速；雲端排行榜同一個暱稱只列最高分。
 
 更新頭像、項目連結或聯絡頻道：在網址後加上 `#edit` 開啟站長面板，改好後按「發布到 GitHub」（或「下載 index.html」，再用下載的檔案取代這裡的 `index.html`）。

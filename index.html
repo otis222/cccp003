@@ -829,6 +829,18 @@ const PROFILE = {
     { id: 'archive', ch: 'CH.03', title: 'Personal Site v1', zh: '個人網站 v1', st: 'arch', color: 5, patch: 'PERSONAL SITE · VERSION 1 ·',
       d: '上一版個人網站：工業風人事檔案介面，附自訂照片預覽與一鍵複製信箱。',
       tags: ['HTML', 'CSS', 'JavaScript'] }
+  ],
+  // 工具箱（SEC. 04）：每個工具都是獨立網頁
+  tools: [
+    { id: 'imgpress', ch: 'TL.01', url: 'image.html', title: 'Image Press', zh: '圖片批次壓縮轉檔', st: 'live', color: 1, patch: 'IMAGE PRESS · LOCAL ONLY ·',
+      d: '拖曳多張圖片，在瀏覽器裡批次壓縮、等比縮放，轉成 WebP、PNG 或 JPG，圖片不用上傳。',
+      tags: ['WebP', 'Canvas', 'ZIP'] },
+    { id: 'colorlab', ch: 'TL.02', url: 'color.html', title: 'Color Lab', zh: 'UI 配色與對比度', st: 'live', color: 3, patch: 'COLOR LAB · WCAG 2.2 · AA ·',
+      d: '輸入一個主色，自動生成色階、輔助色和語意色，即時檢查文字對比度，點色塊就複製 HEX 或 CSS 變數。',
+      tags: ['OKLCH', 'WCAG', 'CSS 變數'] },
+    { id: 'wx', ch: 'TL.03', url: 'weather.html', title: 'Weather', zh: '天氣預報', st: 'live', color: 2, patch: 'WX STATION · OPEN-METEO ·',
+      d: '看台北或你所在地的現在天氣與 7 天預報，再依天氣給帶傘、穿搭、跑步、夜遊建議。',
+      tags: ['Open-Meteo', 'API', '定位'] }
   ]
 };
 
@@ -842,7 +854,7 @@ const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const HOVER = matchMedia('(hover: hover) and (pointer: fine)').matches;
-const SECTIONS = [['profile', '01', '檔案', 'PROFILE'], ['modules', '02', '模組', 'MODULES'], ['news', '03', '消息', 'NEWS'], ['contact', '04', '通訊', 'CONTACT']];
+const SECTIONS = [['profile', '01', '檔案', 'PROFILE'], ['modules', '02', '模組', 'MODULES'], ['news', '03', '消息', 'NEWS'], ['tools', '04', '工具', 'TOOLS'], ['contact', '05', '通訊', 'CONTACT']];
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* storage unavailable */ } },
@@ -968,7 +980,10 @@ const PATCH_ICONS = {
   guild: '<path class="pt-ic" d="M50 35L63 40L61.5 54C60 60 55.5 63.5 50 66C44.5 63.5 40 60 38.5 54L37 40Z"/><path class="pt-ic" d="M44 51L48.5 55.5L57 46.5"/>',
   snake: '<path class="pt-ic" d="M35 57L41 45L47 57L53 45L59 57"/><circle class="pt-icf" cx="65" cy="45" r="3.4"/>',
   rps: '<path class="pt-ic" d="M44 36L50 47L56 36"/><circle class="pt-icf" cx="41" cy="57" r="4.6"/><path class="pt-ic" d="M53 52H63V62H53Z"/>',
-  archive: '<path class="pt-ic" d="M37 45H58V61H37Z"/><path class="pt-ic" d="M42 40H63V56"/>'
+  archive: '<path class="pt-ic" d="M37 45H58V61H37Z"/><path class="pt-ic" d="M42 40H63V56"/>',
+  imgpress: '<path class="pt-icf" d="M36 40L48 50L36 60ZM64 40L52 50L64 60Z"/>',
+  colorlab: '<path class="pt-icf" d="M50 37A13 13 0 0 0 50 63Z"/><path class="pt-ic" d="M50 37A13 13 0 0 1 50 63"/>',
+  wx: '<circle class="pt-ic" cx="50" cy="50" r="6.5"/><path class="pt-ic" d="M50 36V40M50 60V64M36 50H40M60 50H64M40.5 40.5L43 43M57 57L59.5 59.5M40.5 59.5L43 57M57 43L59.5 40.5"/>'
 };
 function patch(p, size) {
   const id = 'pp-' + p.id;
@@ -992,6 +1007,16 @@ function channelCard(p, data) {
     '<p>' + esc(p.d) + '</p>' +
     '<ul class="tags" aria-label="技術">' + p.tags.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul>' +
     '<div class="ch-foot" data-link="' + p.id + '">' + linkBlock(p.id, data) + '</div></article>';
+}
+
+// 工具箱卡片：同一個分頁打開（工具頁都有「回首頁」）
+function toolCard(t) {
+  return '<article class="ch" aria-labelledby="t-' + t.id + '">' +
+    '<div class="ch-head">' + patch(t, 56) + '<div class="ch-meta"><span class="ch-no">' + t.ch + '</span>' + pill(t.st) + '</div></div>' +
+    '<h3 id="t-' + t.id + '"><span class="en">' + esc(t.title) + '</span><span class="zh">' + esc(t.zh) + '</span></h3>' +
+    '<p>' + esc(t.d) + '</p>' +
+    '<ul class="tags" aria-label="功能">' + t.tags.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' +
+    '<div class="ch-foot"><a class="ch-link" href="' + esc(t.url) + '"><span class="sig sig--on" aria-hidden="true"><i></i><i></i><i></i><i></i></span>開啟工具 <em>OPEN</em><span class="go" aria-hidden="true">→</span></a></div></article>';
 }
 
 // only projects that are online (have a link) get a card
@@ -1152,9 +1177,15 @@ function renderApp() {
       '<div class="news" id="news-box" data-tx-off aria-live="polite"><p class="news-empty">讀取中…</p></div>' +
     '</section>' +
 
-    /* 04 contact */
-    '<section class="sheet" id="contact" aria-labelledby="h-contact"><span class="sheet-tab">SEC. 04 <span>通訊</span></span>' + screws +
-      secHead('contact', '04', 'Section 04 · Correspondence', '聯絡方式', 'CONTACT') +
+    /* 04 tools — 自己做的小工具，每個都是獨立網頁（image.html、color.html、weather.html） */
+    '<section class="sheet" id="tools" aria-labelledby="h-tools"><span class="sheet-tab">SEC. 04 <span>工具</span></span>' + screws +
+      secHead('tools', '04', 'Section 04 · Instruments', '工具箱', 'TOOLS', '自己會用的小工具，全部在瀏覽器裡執行，打開就能用。') +
+      '<div class="chs" id="tool-grid">' + PROFILE.tools.map(toolCard).join('') + '</div>' +
+    '</section>' +
+
+    /* 05 contact */
+    '<section class="sheet" id="contact" aria-labelledby="h-contact"><span class="sheet-tab">SEC. 05 <span>通訊</span></span>' + screws +
+      secHead('contact', '05', 'Section 05 · Correspondence', '聯絡方式', 'CONTACT') +
       '<div class="dispatch">' +
         '<div><p class="lede">想聊遊戲開發、技術美術、互動設計，或有合作機會，歡迎直接來信。</p>' +
           '<div class="airmail">' + postmark() + '<span class="label">Par Avion · 航空郵件</span><output class="mail-addr" id="mail-addr" data-tx-off>' + esc(CUR.email) + '</output>' +
@@ -2725,7 +2756,7 @@ function bindUI() {
   });
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) setCurrent(e.target.id); }); }, { rootMargin: '-42% 0px -52% 0px' });
-    ['top', 'profile', 'modules', 'news', 'contact'].forEach(id => { const el = document.getElementById(id); if (el) io.observe(el); });
+    ['top', 'profile', 'modules', 'news', 'tools', 'contact'].forEach(id => { const el = document.getElementById(id); if (el) io.observe(el); });
   }
   addEventListener('scroll', () => { readScroll(); if (REDUCED) settle(); }, { passive: true });
   addEventListener('resize', () => { readScroll(); placeStations(); GL.resize(); if (REDUCED) settle(); }, { passive: true });
